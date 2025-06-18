@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterOutlet } from '@angular/router';
 import { MatTabsModule } from '@angular/material/tabs';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { ThemeService } from './core/services/theme.service';
 import { ScenarioStatisticsComponent } from './features/scenario-statistics/scenario-statistics.component';
 
@@ -12,6 +13,7 @@ import { ScenarioStatisticsComponent } from './features/scenario-statistics/scen
     CommonModule,
     RouterOutlet,
     MatTabsModule,
+    BrowserAnimationsModule,
     ScenarioStatisticsComponent
   ],
   templateUrl: './app.component.html',
