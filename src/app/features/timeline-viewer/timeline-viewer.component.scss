@@ -1,0 +1,370 @@
+.timeline-card {
+  margin: 16px 0;
+  min-height: 300px;
+}
+
+.no-data-state,
+.loading-state,
+.error-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 48px 24px;
+  text-align: center;
+  min-height: 200px;
+}
+
+.no-data-icon,
+.error-icon {
+  font-size: 48px;
+  width: 48px;
+  height: 48px;
+  margin-bottom: 16px;
+  opacity: 0.5;
+  color: rgba(0, 0, 0, 0.4);
+}
+
+.error-icon {
+  color: #f44336;
+  opacity: 0.8;
+}
+
+.no-data-text,
+.loading-text,
+.error-text {
+  margin: 0;
+  font-size: 14px;
+  color: rgba(0, 0, 0, 0.6);
+}
+
+.loading-text {
+  margin-top: 16px;
+}
+
+.error-text {
+  margin-bottom: 16px;
+}
+
+.timeline-container {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.timeline-controls {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 16px;
+  background-color: #f5f5f5;
+  border-radius: 8px;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.zoom-controls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  
+  .zoom-button {
+    width: 36px;
+    height: 36px;
+  }
+  
+  .zoom-level {
+    font-size: 12px;
+    font-weight: 500;
+    min-width: 40px;
+    text-align: center;
+    color: #666;
+  }
+}
+
+.timeline-info {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  
+  .frame-count,
+  .total-frames {
+    font-size: 11px;
+    color: #666;
+  }
+  
+  .frame-count {
+    font-weight: 500;
+  }
+}
+
+.legend {
+  display: flex;
+  gap: 16px;
+  
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 11px;
+    color: #666;
+    
+    .legend-color {
+      width: 12px;
+      height: 12px;
+      border-radius: 2px;
+      
+      &.present {
+        background-color: #4caf50;
+      }
+      
+      &.absent {
+        background-color: #f44336;
+      }
+    }
+  }
+}
+
+.timeline-scroll-container {
+  position: relative;
+  overflow-x: auto;
+  overflow-y: hidden;
+  border: 1px solid #e0e0e0;
+  border-radius: 4px;
+  background-color: #fafafa;
+  height: 120px;
+  
+  &::-webkit-scrollbar {
+    height: 8px;
+  }
+  
+  &::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 4px;
+  }
+  
+  &::-webkit-scrollbar-thumb {
+    background: #c1c1c1;
+    border-radius: 4px;
+    
+    &:hover {
+      background: #a8a8a8;
+    }
+  }
+}
+
+.timeline-track {
+  display: flex;
+  align-items: center;
+  height: 100%;
+  padding: 8px;
+  gap: 2px;
+}
+
+.timeline-frame {
+  position: relative;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border-radius: 4px;
+  overflow: hidden;
+  
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    z-index: 2;
+  }
+  
+  &.selected {
+    transform: translateY(-4px);
+    box-shadow: 0 6px 12px rgba(25, 118, 210, 0.3);
+    border: 2px solid #1976d2;
+    z-index: 3;
+  }
+  
+  &.scenario-present {
+    border-bottom: 3px solid #4caf50;
+  }
+  
+  &.scenario-absent {
+    border-bottom: 3px solid #f44336;
+  }
+}
+
+.frame-thumbnail {
+  position: relative;
+  width: 100%;
+  height: 80px;
+  background-color: #e0e0e0;
+  border-radius: 2px;
+  overflow: hidden;
+  
+  .thumbnail-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: opacity 0.2s ease;
+  }
+  
+  .frame-number-overlay {
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    background: rgba(0, 0, 0, 0.7);
+    color: white;
+    font-size: 9px;
+    font-weight: 500;
+    padding: 2px 4px;
+    border-radius: 2px;
+    line-height: 1;
+  }
+  
+  .scenario-indicator {
+    position: absolute;
+    top: 2px;
+    right: 2px;
+    
+    .indicator-icon {
+      font-size: 14px;
+      width: 14px;
+      height: 14px;
+      color: white;
+      filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.5));
+    }
+  }
+}
+
+.timeline-marker {
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 2px;
+  height: 8px;
+  background-color: #666;
+  border-radius: 1px;
+}
+
+.timeline-scale {
+  position: relative;
+  height: 30px;
+  border-top: 1px solid #e0e0e0;
+  background-color: #fafafa;
+  
+  .scale-marker {
+    position: absolute;
+    top: 0;
+    transform: translateX(-50%);
+    
+    .scale-tick {
+      width: 1px;
+      height: 8px;
+      background-color: #999;
+      margin: 0 auto;
+    }
+    
+    .scale-label {
+      display: block;
+      font-size: 10px;
+      color: #666;
+      text-align: center;
+      margin-top: 2px;
+      white-space: nowrap;
+    }
+  }
+}
+
+// Dark theme support
+:host-context(.dark-theme) {
+  .no-data-icon,
+  .error-icon {
+    color: rgba(255, 255, 255, 0.4);
+  }
+  
+  .no-data-text,
+  .loading-text,
+  .error-text {
+    color: rgba(255, 255, 255, 0.6);
+  }
+  
+  .timeline-controls {
+    background-color: #424242;
+  }
+  
+  .zoom-level,
+  .frame-count,
+  .total-frames,
+  .legend-item {
+    color: rgba(255, 255, 255, 0.7);
+  }
+  
+  .timeline-scroll-container {
+    border-color: #616161;
+    background-color: #424242;
+  }
+  
+  .timeline-scale {
+    border-top-color: #616161;
+    background-color: #424242;
+    
+    .scale-label {
+      color: rgba(255, 255, 255, 0.7);
+    }
+    
+    .scale-tick {
+      background-color: rgba(255, 255, 255, 0.5);
+    }
+  }
+  
+  .frame-thumbnail {
+    background-color: #616161;
+  }
+  
+  .timeline-marker {
+    background-color: rgba(255, 255, 255, 0.7);
+  }
+}
+
+// Responsive design
+@media (max-width: 768px) {
+  .timeline-controls {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+    
+    .zoom-controls,
+    .timeline-info,
+    .legend {
+      justify-content: center;
+    }
+    
+    .legend {
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+  }
+  
+  .timeline-scroll-container {
+    height: 100px;
+  }
+  
+  .frame-thumbnail {
+    height: 60px;
+  }
+}
+
+// Animation for timeline loading
+.timeline-track {
+  animation: slideIn 0.3s ease-out;
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateX(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
