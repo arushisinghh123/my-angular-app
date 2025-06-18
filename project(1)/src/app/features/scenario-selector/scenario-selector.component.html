@@ -1,0 +1,55 @@
+<mat-card class="selector-card">
+  <mat-card-header>
+    <mat-card-title>Scenario Selector</mat-card-title>
+    <mat-card-subtitle>Choose a driving scenario to analyze</mat-card-subtitle>
+  </mat-card-header>
+  <mat-card-content>
+    <mat-form-field class="full-width" appearance="outline">
+      <mat-label>Select Scenario</mat-label>
+      <input 
+        type="text"
+        placeholder="Type to search scenarios..."
+        aria-label="Scenario"
+        matInput
+        [formControl]="scenarioControl"
+        [matAutocomplete]="auto">
+      <mat-icon matSuffix>search</mat-icon>
+      <mat-autocomplete 
+        #auto="matAutocomplete" 
+        [displayWith]="displayFn"
+        (optionSelected)="onScenarioSelected($event.option.value)">
+        <mat-option 
+          *ngFor="let scenario of filteredScenarios$ | async" 
+          [value]="scenario"
+          class="scenario-option">
+          <div class="scenario-info">
+            <span class="scenario-name">{{ scenario.name }}</span>
+            <span class="scenario-description" *ngIf="scenario.description">
+              {{ scenario.description }}
+            </span>
+          </div>
+        </mat-option>
+      </mat-autocomplete>
+    </mat-form-field>
+
+    <div class="actions" *ngIf="scenarioControl.value">
+      <button 
+        mat-stroked-button 
+        color="primary" 
+        (click)="clearSelection()"
+        class="clear-button">
+        <mat-icon>clear</mat-icon>
+        Clear Selection
+      </button>
+    </div>
+
+    <div class="selected-info" *ngIf="scenarioControl.value && typeof scenarioControl.value === 'object'">
+      <mat-chip-listbox>
+        <mat-chip-option selected>
+          <mat-icon>folder</mat-icon>
+          {{ scenarioControl.value.name }}
+        </mat-chip-option>
+      </mat-chip-listbox>
+    </div>
+  </mat-card-content>
+</mat-card>
