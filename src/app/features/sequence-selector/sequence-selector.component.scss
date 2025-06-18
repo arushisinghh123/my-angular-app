@@ -1,0 +1,161 @@
+.selector-card {
+  margin: 16px 0;
+  max-width: 600px;
+}
+
+.full-width {
+  width: 100%;
+}
+
+.sequence-option {
+  padding: 12px 16px;
+  
+  .sequence-info {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    width: 100%;
+    
+    .sequence-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      width: 100%;
+      
+      .sequence-name {
+        font-weight: 500;
+        font-size: 14px;
+        flex: 1;
+      }
+      
+      .scenario-percentage {
+        font-size: 12px;
+        font-weight: 600;
+        color: #1976d2;
+        background-color: rgba(25, 118, 210, 0.1);
+        padding: 2px 8px;
+        border-radius: 12px;
+        margin-left: 8px;
+      }
+    }
+    
+    .sequence-description {
+      font-size: 12px;
+      color: rgba(0, 0, 0, 0.6);
+      font-style: italic;
+    }
+  }
+}
+
+.actions {
+  margin-top: 16px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  
+  .filter-actions {
+    display: flex;
+    gap: 8px;
+    flex: 1;
+  }
+  
+  .action-button {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  
+  .clear-button {
+    margin-left: auto;
+  }
+}
+
+.selected-info {
+  margin-top: 16px;
+  
+  mat-chip-listbox {
+    mat-chip-option {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      
+      .chip-percentage {
+        font-size: 11px;
+        opacity: 0.8;
+      }
+    }
+  }
+}
+
+.no-sequences {
+  text-align: center;
+  padding: 24px;
+  color: rgba(0, 0, 0, 0.6);
+  
+  .no-data-icon {
+    font-size: 48px;
+    width: 48px;
+    height: 48px;
+    margin-bottom: 16px;
+    opacity: 0.5;
+  }
+  
+  p {
+    margin-bottom: 16px;
+    font-size: 14px;
+  }
+}
+
+// Dark theme support
+:host-context(.dark-theme) {
+  .sequence-option {
+    .sequence-info {
+      .sequence-header {
+        .scenario-percentage {
+          color: #90caf9;
+          background-color: rgba(144, 202, 249, 0.1);
+        }
+      }
+      
+      .sequence-description {
+        color: rgba(255, 255, 255, 0.6);
+      }
+    }
+  }
+  
+  .no-sequences {
+    color: rgba(255, 255, 255, 0.6);
+  }
+}
+
+// Responsive design
+@media (max-width: 600px) {
+  .actions {
+    flex-direction: column;
+    align-items: stretch;
+    
+    .filter-actions {
+      flex-direction: column;
+    }
+    
+    .clear-button {
+      margin-left: 0;
+    }
+  }
+  
+  .sequence-option {
+    .sequence-info {
+      .sequence-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 4px;
+        
+        .scenario-percentage {
+          margin-left: 0;
+          align-self: flex-end;
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,100 @@
+<mat-card class="selector-card">
+  <mat-card-header>
+    <mat-card-title>Sequence Selector</mat-card-title>
+    <mat-card-subtitle>
+      <span *ngIf="!hasScenarioSelected">Select a scenario first to filter sequences</span>
+      <span *ngIf="hasScenarioSelected && !showAllSequences">
+        Showing {{ filteredSequenceCount }} sequences for "{{ selectedScenario?.name }}"
+      </span>
+      <span *ngIf="hasScenarioSelected && showAllSequences">
+        Showing all {{ totalSequenceCount }} sequences
+      </span>
+    </mat-card-subtitle>
+  </mat-card-header>
+  <mat-card-content>
+    <mat-form-field class="full-width" appearance="outline">
+      <mat-label>Select Sequence</mat-label>
+      <mat-select 
+        [formControl]="sequenceControl"
+        [disabled]="filteredSequences.length === 0">
+        <mat-option 
+          *ngFor="let sequence of filteredSequences" 
+          [value]="sequence"
+          class="sequence-option">
+          <div class="sequence-info">
+            <div class="sequence-header">
+              <span class="sequence-name">{{ sequence.name }}</span>
+              <span 
+                class="scenario-percentage" 
+                *ngIf="hasScenarioSelected && !showAllSequences">
+                {{ getScenarioPercentage(sequence) }}%
+              </span>
+            </div>
+            <span class="sequence-description" *ngIf="sequence.description">
+              {{ sequence.description }}
+            </span>
+          </div>
+        </mat-option>
+      </mat-select>
+      <mat-icon matSuffix>playlist_play</mat-icon>
+    </mat-form-field>
+
+    <div class="actions">
+      <div class="filter-actions" *ngIf="hasScenarioSelected">
+        <button 
+          mat-stroked-button 
+          color="accent"
+          (click)="onShowAllSequences()"
+          *ngIf="!showAllSequences"
+          class="action-button">
+          <mat-icon>visibility</mat-icon>
+          Show All Sequences
+        </button>
+        <button 
+          mat-stroked-button 
+          color="primary"
+          (click)="onShowFilteredSequences()"
+          *ngIf="showAllSequences"
+          class="action-button">
+          <mat-icon>filter_list</mat-icon>
+          Show Filtered Sequences
+        </button>
+      </div>
+      
+      <button 
+        mat-stroked-button 
+        color="warn"
+        (click)="clearSelection()"
+        *ngIf="sequenceControl.value"
+        class="action-button clear-button">
+        <mat-icon>clear</mat-icon>
+        Clear Selection
+      </button>
+    </div>
+
+    <div class="selected-info" *ngIf="sequenceControl.value">
+      <mat-chip-listbox>
+        <mat-chip-option selected>
+          <mat-icon>playlist_play</mat-icon>
+          {{ sequenceControl.value.name }}
+          <span 
+            class="chip-percentage" 
+            *ngIf="hasScenarioSelected && !showAllSequences">
+            ({{ getScenarioPercentage(sequenceControl.value) }}%)
+          </span>
+        </mat-chip-option>
+      </mat-chip-listbox>
+    </div>
+
+    <div class="no-sequences" *ngIf="filteredSequences.length === 0 && hasScenarioSelected">
+      <mat-icon class="no-data-icon">info</mat-icon>
+      <p>No sequences found for the selected scenario.</p>
+      <button 
+        mat-raised-button 
+        color="primary" 
+        (click)="onShowAllSequences()">
+        Show All Sequences
+      </button>
+    </div>
+  </mat-card-content>
+</mat-card>

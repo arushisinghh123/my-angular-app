@@ -1,0 +1,64 @@
+.selector-card {
+  margin: 16px 0;
+  max-width: 600px;
+}
+
+.full-width {
+  width: 100%;
+}
+
+.scenario-option {
+  padding: 12px 16px;
+  
+  .scenario-info {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    
+    .scenario-name {
+      font-weight: 500;
+      font-size: 14px;
+    }
+    
+    .scenario-description {
+      font-size: 12px;
+      color: rgba(0, 0, 0, 0.6);
+      font-style: italic;
+    }
+  }
+}
+
+.actions {
+  margin-top: 16px;
+  display: flex;
+  gap: 8px;
+  
+  .clear-button {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+}
+
+.selected-info {
+  margin-top: 16px;
+  
+  mat-chip-listbox {
+    mat-chip-option {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+  }
+}
+
+// Dark theme support
+:host-context(.dark-theme) {
+  .scenario-option {
+    .scenario-info {
+      .scenario-description {
+        color: rgba(255, 255, 255, 0.6);
+      }
+    }
+  }
+}
