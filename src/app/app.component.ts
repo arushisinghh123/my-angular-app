@@ -1,13 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterOutlet } from '@angular/router';
-import { MatToolbarModule } from '@angular/material/toolbar';
-import { MatSidenavModule } from '@angular/material/sidenav';
-import { MatIconModule } from '@angular/material/icon';
-import { MatButtonModule } from '@angular/material/button';
-import { MatListModule } from '@angular/material/list';
-import { MatSlideToggleModule } from '@angular/material/slide-toggle';
+import { MatTabsModule } from '@angular/material/tabs';
 import { ThemeService } from './core/services/theme.service';
+import { ScenarioStatisticsComponent } from './features/scenario-statistics/scenario-statistics.component';
 
 @Component({
   selector: 'app-root',
@@ -15,12 +11,8 @@ import { ThemeService } from './core/services/theme.service';
   imports: [
     CommonModule,
     RouterOutlet,
-    MatToolbarModule,
-    MatSidenavModule,
-    MatIconModule,
-    MatButtonModule,
-    MatListModule,
-    MatSlideToggleModule
+    MatTabsModule,
+    ScenarioStatisticsComponent
   ],
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss']

@@ -2,6 +2,16 @@
   <!-- Header -->
   <div class="dashboard-header">
     <h1 class="dashboard-title">Sequence Analysis Dashboard</h1>
+    
+    <!-- Theme Toggle -->
+    <div class="theme-toggle">
+      <mat-slide-toggle
+        [checked]="isDarkMode"
+        (change)="toggleTheme()"
+        aria-label="Toggle dark mode">
+        <mat-icon>{{ isDarkMode ? 'dark_mode' : 'light_mode' }}</mat-icon>
+      </mat-slide-toggle>
+    </div>
   </div>
 
   <!-- Top Filters Section -->
@@ -149,16 +159,26 @@
           </div>
         </div>
       </div>
+
+      <!-- Timeline Viewer -->
+      <div class="timeline-section" *ngIf="selectedSequence">
+        <app-timeline-viewer
+          [selectedScenario]="selectedScenario"
+          [selectedSequence]="selectedSequence"
+          [selectedFrameNumber]="currentFrame"
+          (frameSelected)="onTimelineFrameSelected($event)">
+        </app-timeline-viewer>
+      </div>
     </div>
 
     <!-- Right Column - Frame Details -->
     <div class="right-column">
       <!-- Frame Image Viewer -->
       <div class="frame-viewer-section">
-        <h3 class="section-subtitle">Frame Image Viewer</h3>
+        <h3 class="section-subtitle centered-title">Frame Image Viewer</h3>
         
         <div class="frame-display">
-          <div class="image-container" *ngIf="currentFrameData; else noFrameSelected">
+          <div class="image-container" *ngIf="currentFrameData && showFrameImage; else noFrameSelected">
             <img 
               [src]="currentFrameData.imagePath" 
               [alt]="'Frame ' + currentFrameData.frameNumber"
@@ -174,11 +194,11 @@
           <ng-template #noFrameSelected>
             <div class="no-frame-placeholder">
               <mat-icon class="placeholder-icon">photo</mat-icon>
-              <p>Select a frame to view</p>
+              <p>Click GO to view frame or select from timeline</p>
             </div>
           </ng-template>
 
-          <div class="frame-info" *ngIf="currentFrameData && selectedSequence">
+          <div class="frame-info" *ngIf="currentFrameData && selectedSequence && showFrameImage">
             <div class="info-row">
               <span class="info-label">Sequence:</span>
               <span class="info-value">{{ selectedSequence.name }}</span>
@@ -202,48 +222,48 @@
 
       <!-- Frame Navigation -->
       <div class="frame-navigation-section">
-        <h3 class="section-subtitle">Frame Navigation</h3>
+        <h3 class="section-subtitle centered-title">Frame Navigation</h3>
         
         <div class="navigation-controls">
-          <div class="nav-buttons">
+          <div class="nav-buttons-compact">
             <button 
               mat-stroked-button 
-              class="nav-btn"
+              class="nav-btn-small"
               (click)="navigateFrame(-100)"
               [disabled]="!canNavigate(-100)">
               -100
             </button>
             <button 
               mat-stroked-button 
-              class="nav-btn"
+              class="nav-btn-small"
               (click)="navigateFrame(-10)"
               [disabled]="!canNavigate(-10)">
               -10
             </button>
             <button 
               mat-stroked-button 
-              class="nav-btn"
+              class="nav-btn-small"
               (click)="navigateFrame(-1)"
               [disabled]="!canNavigate(-1)">
               -1
             </button>
             <button 
               mat-stroked-button 
-              class="nav-btn"
+              class="nav-btn-small"
               (click)="navigateFrame(1)"
               [disabled]="!canNavigate(1)">
               +1
             </button>
             <button 
               mat-stroked-button 
-              class="nav-btn"
+              class="nav-btn-small"
               (click)="navigateFrame(10)"
               [disabled]="!canNavigate(10)">
               +10
             </button>
             <button 
               mat-stroked-button 
-              class="nav-btn"
+              class="nav-btn-small"
               (click)="navigateFrame(100)"
               [disabled]="!canNavigate(100)">
               +100
@@ -294,14 +314,3 @@
     <p>Please select a scenario to begin analysis</p>
   </div>
 </div>
-
-<!-- Image Popup -->
-<app-image-popup
-  *ngIf="showImagePopup"
-  [imagePath]="popupImageData.imagePath"
-  [frameNumber]="popupImageData.frameNumber"
-  [sequenceName]="popupImageData.sequenceName"
-  [scenarioName]="popupImageData.scenarioName"
-  [scenarioPresence]="popupImageData.scenarioPresence"
-  (closePopup)="closeImagePopup()">
-</app-image-popup>

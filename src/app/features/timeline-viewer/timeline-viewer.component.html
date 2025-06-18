@@ -48,12 +48,20 @@
           </button>
         </div>
 
-        <!-- New Scroll Buttons -->
+        <!-- Scroll Controls -->
         <div class="scroll-controls">
-          <button mat-icon-button (click)="scrollTimeline('left')" matTooltip="Scroll Left">
+          <button 
+            mat-icon-button 
+            (click)="scrollTimeline('left')" 
+            matTooltip="Scroll Left"
+            class="scroll-button">
             <mat-icon>arrow_back</mat-icon>
           </button>
-          <button mat-icon-button (click)="scrollTimeline('right')" matTooltip="Scroll Right">
+          <button 
+            mat-icon-button 
+            (click)="scrollTimeline('right')" 
+            matTooltip="Scroll Right"
+            class="scroll-button">
             <mat-icon>arrow_forward</mat-icon>
           </button>
         </div>
@@ -91,7 +99,7 @@
             [class.selected]="selectedFrameNumber === frame.frameNumber"
             [style.width.px]="frameWidth"
             (click)="onFrameClick(frame.frameNumber)"
-            [matTooltip]="'Frame ' + frame.frameNumber"
+            [matTooltip]="'Frame ' + frame.frameNumber + ' (' + frame.timestamp + ')'"
             matTooltipPosition="above"
             matTooltipShowDelay="300">
 

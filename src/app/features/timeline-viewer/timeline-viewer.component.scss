@@ -1,6 +1,9 @@
 .timeline-card {
-  margin: 16px 0;
+  margin: 0;
   min-height: 300px;
+  box-shadow: none;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
 }
 
 .no-data-state,
@@ -71,6 +74,10 @@
   .zoom-button {
     width: 36px;
     height: 36px;
+    
+    &:hover:not(:disabled) {
+      background-color: rgba(0, 0, 0, 0.1);
+    }
   }
   
   .zoom-level {
@@ -79,6 +86,21 @@
     min-width: 40px;
     text-align: center;
     color: #666;
+  }
+}
+
+.scroll-controls {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  
+  .scroll-button {
+    width: 36px;
+    height: 36px;
+    
+    &:hover {
+      background-color: rgba(0, 0, 0, 0.1);
+    }
   }
 }
 
@@ -274,8 +296,13 @@
   }
 }
 
-// Dark theme support
+// Dark theme support with enhanced colors
 :host-context(.dark-theme) {
+  .timeline-card {
+    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+    border-color: #3a4a6b;
+  }
+  
   .no-data-icon,
   .error-icon {
     color: rgba(255, 255, 255, 0.4);
@@ -288,40 +315,76 @@
   }
   
   .timeline-controls {
-    background-color: #424242;
+    background-color: #16213e;
+    border: 1px solid #3a4a6b;
   }
   
   .zoom-level,
   .frame-count,
   .total-frames,
   .legend-item {
-    color: rgba(255, 255, 255, 0.7);
+    color: #b0c4de;
+  }
+  
+  .zoom-button,
+  .scroll-button {
+    color: #b0c4de;
+    
+    &:hover:not(:disabled) {
+      background-color: rgba(255, 255, 255, 0.1);
+      color: #ffffff;
+    }
   }
   
   .timeline-scroll-container {
-    border-color: #616161;
-    background-color: #424242;
+    border-color: #3a4a6b;
+    background-color: #16213e;
   }
   
   .timeline-scale {
-    border-top-color: #616161;
-    background-color: #424242;
+    border-top-color: #3a4a6b;
+    background-color: #16213e;
     
     .scale-label {
-      color: rgba(255, 255, 255, 0.7);
+      color: #b0c4de;
     }
     
     .scale-tick {
-      background-color: rgba(255, 255, 255, 0.5);
+      background-color: #b0c4de;
     }
   }
   
   .frame-thumbnail {
-    background-color: #616161;
+    background-color: #3a4a6b;
   }
   
   .timeline-marker {
-    background-color: rgba(255, 255, 255, 0.7);
+    background-color: #b0c4de;
+  }
+  
+  .timeline-frame {
+    &.scenario-present {
+      border-bottom-color: #66bb6a;
+    }
+    
+    &.scenario-absent {
+      border-bottom-color: #ef5350;
+    }
+    
+    &.selected {
+      border-color: #64b5f6;
+      box-shadow: 0 6px 12px rgba(100, 181, 246, 0.3);
+    }
+  }
+  
+  .legend-color {
+    &.present {
+      background-color: #66bb6a;
+    }
+    
+    &.absent {
+      background-color: #ef5350;
+    }
   }
 }
 
@@ -333,6 +396,7 @@
     gap: 12px;
     
     .zoom-controls,
+    .scroll-controls,
     .timeline-info,
     .legend {
       justify-content: center;
