@@ -5,7 +5,7 @@ import { routes } from './app.routes';
 
 export const appConfig: ApplicationConfig = {
   providers: [
-    provideRouter(routes)
-    //importProvidersFrom(BrowserAnimationsModule)  // ✅ this is fine
+    provideRouter(routes),
+    importProvidersFrom(BrowserAnimationsModule)  // ✅ this is fine
   ]
 };
