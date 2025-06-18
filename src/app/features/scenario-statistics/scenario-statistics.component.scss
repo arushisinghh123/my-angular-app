@@ -1,0 +1,374 @@
+.statistics-container {
+  padding: 0;
+  background-color: #f5f5f5;
+  min-height: 100%;
+}
+
+.statistics-header {
+  background: white;
+  padding: 32px;
+  border-bottom: 1px solid #e0e0e0;
+  text-align: center;
+  
+  .statistics-title {
+    margin: 0 0 8px 0;
+    font-size: 28px;
+    font-weight: 500;
+    color: #333;
+  }
+  
+  .statistics-subtitle {
+    margin: 0;
+    font-size: 16px;
+    color: #666;
+  }
+}
+
+.statistics-content {
+  padding: 32px;
+}
+
+.loading-state,
+.no-data-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 80px 24px;
+  text-align: center;
+  color: #999;
+  
+  .no-data-icon {
+    font-size: 64px;
+    width: 64px;
+    height: 64px;
+    margin-bottom: 16px;
+    opacity: 0.5;
+  }
+  
+  p {
+    margin: 16px 0 0 0;
+    font-size: 16px;
+  }
+}
+
+.statistics-display {
+  display: grid;
+  grid-template-columns: 1fr 400px;
+  gap: 48px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.chart-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.chart-wrapper {
+  position: relative;
+  width: 400px;
+  height: 400px;
+}
+
+.doughnut-chart {
+  width: 100%;
+  height: 100%;
+  cursor: pointer;
+}
+
+.chart-center-info {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+  pointer-events: none;
+  
+  .total-number {
+    display: block;
+    font-size: 36px;
+    font-weight: 700;
+    color: #333;
+    line-height: 1;
+  }
+  
+  .total-label {
+    display: block;
+    font-size: 14px;
+    color: #666;
+    margin-top: 4px;
+  }
+}
+
+.chart-tooltip {
+  position: absolute;
+  background: rgba(0, 0, 0, 0.9);
+  color: white;
+  padding: 12px;
+  border-radius: 8px;
+  font-size: 12px;
+  pointer-events: none;
+  z-index: 1000;
+  min-width: 180px;
+  
+  .tooltip-content {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  
+  .tooltip-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    
+    .tooltip-color {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+    }
+    
+    .tooltip-scenario {
+      font-weight: 600;
+      font-size: 13px;
+    }
+  }
+  
+  .tooltip-stats {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+  
+  .tooltip-stat {
+    display: flex;
+    justify-content: space-between;
+    
+    .stat-label {
+      opacity: 0.8;
+    }
+    
+    .stat-value {
+      font-weight: 500;
+    }
+  }
+}
+
+.legend-container {
+  .legend-title {
+    margin: 0 0 24px 0;
+    font-size: 20px;
+    font-weight: 500;
+    color: #333;
+  }
+}
+
+.legend-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.legend-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 16px;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  
+  &:hover,
+  &.highlighted {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  }
+  
+  .legend-color {
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    margin-top: 2px;
+    flex-shrink: 0;
+  }
+  
+  .legend-info {
+    flex: 1;
+    
+    .legend-scenario {
+      display: block;
+      font-weight: 600;
+      font-size: 16px;
+      color: #333;
+      margin-bottom: 4px;
+    }
+    
+    .legend-stats {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 4px;
+      
+      .legend-percentage {
+        font-weight: 600;
+        font-size: 18px;
+        color: #1976d2;
+      }
+      
+      .legend-count {
+        font-size: 14px;
+        color: #666;
+      }
+    }
+    
+    .legend-frames {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      
+      .frames-label {
+        font-size: 12px;
+        color: #666;
+      }
+      
+      .frames-value {
+        font-size: 12px;
+        font-weight: 500;
+        color: #333;
+      }
+    }
+  }
+}
+
+// Enhanced Dark theme support
+:host-context(.dark-theme) {
+  .statistics-container {
+    background-color: #121212;
+  }
+  
+  .statistics-header {
+    background: linear-gradient(135deg, #1e1e1e 0%, #2d2d2d 100%);
+    border-bottom-color: #333;
+  }
+  
+  .statistics-title {
+    color: #ffffff;
+  }
+  
+  .statistics-subtitle {
+    color: #b0b0b0;
+  }
+  
+  .chart-center-info {
+    .total-number {
+      color: #ffffff;
+    }
+    
+    .total-label {
+      color: #b0b0b0;
+    }
+  }
+  
+  .legend-container {
+    .legend-title {
+      color: #ffffff;
+    }
+  }
+  
+  .legend-item {
+    background: linear-gradient(135deg, #1e1e1e 0%, #2d2d2d 100%);
+    border: 1px solid #333;
+    
+    &:hover,
+    &.highlighted {
+      border-color: #bb86fc;
+      box-shadow: 0 4px 12px rgba(187, 134, 252, 0.2);
+    }
+    
+    .legend-scenario {
+      color: #ffffff;
+    }
+    
+    .legend-percentage {
+      color: #bb86fc;
+    }
+    
+    .legend-count {
+      color: #b0b0b0;
+    }
+    
+    .frames-label {
+      color: #b0b0b0;
+    }
+    
+    .frames-value {
+      color: #ffffff;
+    }
+  }
+  
+  .no-data-state {
+    color: #888;
+  }
+}
+
+// Responsive design
+@media (max-width: 1024px) {
+  .statistics-display {
+    grid-template-columns: 1fr;
+    gap: 32px;
+  }
+  
+  .chart-wrapper {
+    width: 300px;
+    height: 300px;
+  }
+}
+
+@media (max-width: 768px) {
+  .statistics-header,
+  .statistics-content {
+    padding: 20px;
+  }
+  
+  .statistics-header {
+    .statistics-title {
+      font-size: 24px;
+    }
+    
+    .statistics-subtitle {
+      font-size: 14px;
+    }
+  }
+  
+  .chart-wrapper {
+    width: 250px;
+    height: 250px;
+  }
+  
+  .chart-center-info {
+    .total-number {
+      font-size: 28px;
+    }
+  }
+}
+
+// Animation
+.statistics-display {
+  animation: fadeIn 0.4s ease-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

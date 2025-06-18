@@ -71,6 +71,16 @@
   .zoom-button {
     width: 36px;
     height: 36px;
+    transition: all 0.2s ease;
+    
+    &:hover:not([disabled]) {
+      background-color: rgba(0, 0, 0, 0.1);
+      transform: scale(1.1);
+    }
+    
+    &[disabled] {
+      opacity: 0.5;
+    }
   }
   
   .zoom-level {
@@ -79,6 +89,23 @@
     min-width: 40px;
     text-align: center;
     color: #666;
+  }
+}
+
+.scroll-controls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  
+  .scroll-button {
+    width: 36px;
+    height: 36px;
+    transition: all 0.2s ease;
+    
+    &:hover {
+      background-color: rgba(0, 0, 0, 0.1);
+      transform: scale(1.1);
+    }
   }
 }
 
@@ -274,7 +301,7 @@
   }
 }
 
-// Dark theme support
+// Enhanced Dark theme support
 :host-context(.dark-theme) {
   .no-data-icon,
   .error-icon {
@@ -288,7 +315,7 @@
   }
   
   .timeline-controls {
-    background-color: #424242;
+    background-color: #2d2d2d;
   }
   
   .zoom-level,
@@ -298,14 +325,24 @@
     color: rgba(255, 255, 255, 0.7);
   }
   
+  .zoom-button,
+  .scroll-button {
+    color: rgba(255, 255, 255, 0.7);
+    
+    &:hover:not([disabled]) {
+      background-color: rgba(255, 255, 255, 0.1);
+      color: #ffffff;
+    }
+  }
+  
   .timeline-scroll-container {
-    border-color: #616161;
-    background-color: #424242;
+    border-color: #333;
+    background-color: #1e1e1e;
   }
   
   .timeline-scale {
-    border-top-color: #616161;
-    background-color: #424242;
+    border-top-color: #333;
+    background-color: #1e1e1e;
     
     .scale-label {
       color: rgba(255, 255, 255, 0.7);
@@ -317,11 +354,26 @@
   }
   
   .frame-thumbnail {
-    background-color: #616161;
+    background-color: #333;
   }
   
   .timeline-marker {
     background-color: rgba(255, 255, 255, 0.7);
+  }
+  
+  .timeline-frame {
+    &.scenario-present {
+      border-bottom-color: #4caf50;
+    }
+    
+    &.scenario-absent {
+      border-bottom-color: #f44336;
+    }
+    
+    &.selected {
+      border-color: #bb86fc;
+      box-shadow: 0 6px 12px rgba(187, 134, 252, 0.3);
+    }
   }
 }
 
@@ -333,6 +385,7 @@
     gap: 12px;
     
     .zoom-controls,
+    .scroll-controls,
     .timeline-info,
     .legend {
       justify-content: center;

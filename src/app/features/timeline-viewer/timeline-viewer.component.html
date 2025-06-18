@@ -48,12 +48,19 @@
           </button>
         </div>
 
-        <!-- New Scroll Buttons -->
         <div class="scroll-controls">
-          <button mat-icon-button (click)="scrollTimeline('left')" matTooltip="Scroll Left">
+          <button 
+            mat-icon-button 
+            (click)="scrollTimeline('left')" 
+            matTooltip="Scroll Left"
+            class="scroll-button">
             <mat-icon>arrow_back</mat-icon>
           </button>
-          <button mat-icon-button (click)="scrollTimeline('right')" matTooltip="Scroll Right">
+          <button 
+            mat-icon-button 
+            (click)="scrollTimeline('right')" 
+            matTooltip="Scroll Right"
+            class="scroll-button">
             <mat-icon>arrow_forward</mat-icon>
           </button>
         </div>

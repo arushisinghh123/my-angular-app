@@ -18,21 +18,13 @@ import { takeUntil, debounceTime, distinctUntilChanged, startWith, map } from 'r
 import { ScenarioService, Scenario } from '../../core/services/scenario.service';
 import { SequenceService, Sequence } from '../../core/services/sequence.service';
 import { ImageService, FrameMetadata } from '../../core/services/image.service';
-import { ImagePopupComponent } from '../image-popup/image-popup.component';
+import { TimelineViewerComponent } from '../timeline-viewer/timeline-viewer.component';
 
 interface SequenceSegment {
   start: number;
   end: number;
   hasScenario: boolean;
   width: number;
-}
-
-interface PopupImageData {
-  imagePath: string;
-  frameNumber: number;
-  sequenceName: string;
-  scenarioName: string;
-  scenarioPresence: boolean;
 }
 
 @Component({
@@ -51,7 +43,7 @@ interface PopupImageData {
     MatProgressSpinnerModule,
     MatTooltipModule,
     MatAutocompleteModule,
-    ImagePopupComponent
+    TimelineViewerComponent
   ],
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.scss']
@@ -74,17 +66,9 @@ export class DashboardComponent implements OnInit, OnDestroy {
   currentFrameData: FrameMetadata | null = null;
 
   imageLoading = false;
-  showImagePopup = false;
+  frameImageLoaded = false;
 
-  sequenceBarWidth = 320; // Increased width
-
-  popupImageData: PopupImageData = {
-    imagePath: '',
-    frameNumber: 0,
-    sequenceName: '',
-    scenarioName: '',
-    scenarioPresence: false
-  };
+  sequenceBarWidth = 320;
 
   private destroy$ = new Subject<void>();
 
@@ -147,7 +131,6 @@ export class DashboardComponent implements OnInit, OnDestroy {
       .subscribe(value => {
         this.selectedSequenceFromInput = typeof value === 'object' ? value : null;
         
-        // Enable/disable frame control based on sequence selection
         if (this.selectedSequenceFromInput) {
           this.frameControl.enable();
         } else {
@@ -156,14 +139,6 @@ export class DashboardComponent implements OnInit, OnDestroy {
         }
         
         this.updateFilteredSequences();
-      });
-
-    this.frameControl.valueChanges
-      .pipe(debounceTime(500), distinctUntilChanged(), takeUntil(this.destroy$))
-      .subscribe(frameNumber => {
-        if (frameNumber && this.selectedSequenceFromInput && this.selectedScenario) {
-          this.loadFrameData(frameNumber, this.selectedSequenceFromInput);
-        }
       });
   }
 
@@ -204,6 +179,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
     if (!this.selectedScenario) return;
 
     this.imageLoading = true;
+    this.frameImageLoaded = false;
     this.currentFrame = frameNumber;
     this.selectedSequence = sequence;
 
@@ -225,6 +201,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
     this.currentFrame = null;
     this.currentFrameData = null;
     this.selectedSequence = null;
+    this.frameImageLoaded = false;
     this.frameControl.setValue(null);
   }
 
@@ -236,6 +213,15 @@ export class DashboardComponent implements OnInit, OnDestroy {
     const frameNumber = this.frameControl.value;
     if (frameNumber && this.selectedSequenceFromInput) {
       this.loadFrameData(frameNumber, this.selectedSequenceFromInput);
+      this.frameImageLoaded = true;
+    }
+  }
+
+  onTimelineFrameSelected(frameNumber: number): void {
+    if (this.selectedSequenceFromInput) {
+      this.frameControl.setValue(frameNumber);
+      this.loadFrameData(frameNumber, this.selectedSequenceFromInput);
+      this.frameImageLoaded = true;
     }
   }
 
@@ -251,6 +237,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
     if (newFrame >= 1 && newFrame <= maxFrames) {
       this.frameControl.setValue(newFrame);
+      this.loadFrameData(newFrame, this.selectedSequence);
     }
   }
 
@@ -313,28 +300,9 @@ export class DashboardComponent implements OnInit, OnDestroy {
     if (!this.selectedScenario) return;
 
     const frameNumber = Math.floor((segment.start + segment.end) / 2);
-
-    this.imageService.getFrameImage(sequence.name, frameNumber, this.selectedScenario.name)
-      .pipe(takeUntil(this.destroy$))
-      .subscribe({
-        next: (frameData) => {
-          this.popupImageData = {
-            imagePath: frameData.imagePath,
-            frameNumber: frameData.frameNumber,
-            sequenceName: frameData.sequenceName,
-            scenarioName: this.selectedScenario!.name,
-            scenarioPresence: frameData.scenarioPresence
-          };
-          this.showImagePopup = true;
-        },
-        error: (error) => {
-          console.error('Error loading frame data for popup:', error);
-        }
-      });
-  }
-
-  closeImagePopup(): void {
-    this.showImagePopup = false;
+    this.frameControl.setValue(frameNumber);
+    this.loadFrameData(frameNumber, sequence);
+    this.frameImageLoaded = true;
   }
 
   zoomSequence(sequenceId: string): void {
@@ -362,7 +330,6 @@ export class DashboardComponent implements OnInit, OnDestroy {
     return `${segment.start}-${segment.end}`;
   }
 
-  // Expose Math to template
   get Math() {
     return Math;
   }

@@ -141,13 +141,35 @@ export class TimelineViewerComponent
 
   zoomIn(): void {
     if (this.zoomLevel < this.maxZoom) {
+      const oldScrollLeft = this.scrollContainer?.nativeElement?.scrollLeft || 0;
+      const oldWidth = this.timelineWidth;
+      
       this.zoomLevel = Math.min(this.maxZoom, this.zoomLevel + 0.25);
+      
+      // Maintain scroll position relative to zoom
+      setTimeout(() => {
+        if (this.scrollContainer?.nativeElement && oldWidth > 0) {
+          const newScrollLeft = (oldScrollLeft / oldWidth) * this.timelineWidth;
+          this.scrollContainer.nativeElement.scrollLeft = newScrollLeft;
+        }
+      }, 0);
     }
   }
 
   zoomOut(): void {
     if (this.zoomLevel > this.minZoom) {
+      const oldScrollLeft = this.scrollContainer?.nativeElement?.scrollLeft || 0;
+      const oldWidth = this.timelineWidth;
+      
       this.zoomLevel = Math.max(this.minZoom, this.zoomLevel - 0.25);
+      
+      // Maintain scroll position relative to zoom
+      setTimeout(() => {
+        if (this.scrollContainer?.nativeElement && oldWidth > 0) {
+          const newScrollLeft = (oldScrollLeft / oldWidth) * this.timelineWidth;
+          this.scrollContainer.nativeElement.scrollLeft = newScrollLeft;
+        }
+      }, 0);
     }
   }
 
@@ -155,7 +177,16 @@ export class TimelineViewerComponent
     const scrollAmount = this.frameSpacing * 5;
     if (this.scrollContainer?.nativeElement) {
       const el = this.scrollContainer.nativeElement;
-      el.scrollLeft += direction === 'left' ? -scrollAmount : scrollAmount;
+      const currentScroll = el.scrollLeft;
+      const targetScroll = direction === 'left' 
+        ? Math.max(0, currentScroll - scrollAmount)
+        : Math.min(el.scrollWidth - el.clientWidth, currentScroll + scrollAmount);
+      
+      // Smooth scroll
+      el.scrollTo({
+        left: targetScroll,
+        behavior: 'smooth'
+      });
     }
   }
 

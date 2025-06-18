@@ -30,3 +30,65 @@ body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
 .p-16 {
   padding: 16px;
 }
+
+// Enhanced Dark theme with vibrant colors
+.dark-theme {
+  background-color: #121212 !important;
+  color: #ffffff !important;
+  
+  // Material components dark theme overrides
+  .mat-mdc-card {
+    background-color: #1e1e1e !important;
+    color: #ffffff !important;
+  }
+  
+  .mat-mdc-form-field {
+    .mat-mdc-text-field-wrapper {
+      background-color: #2d2d2d !important;
+    }
+    
+    .mat-mdc-form-field-label {
+      color: #b0b0b0 !important;
+    }
+    
+    input, textarea {
+      color: #ffffff !important;
+    }
+  }
+  
+  .mat-mdc-select {
+    color: #ffffff !important;
+  }
+  
+  .mat-mdc-option {
+    background-color: #2d2d2d !important;
+    color: #ffffff !important;
+    
+    &:hover {
+      background-color: #3d3d3d !important;
+    }
+  }
+  
+  .mat-mdc-button {
+    color: #bb86fc !important;
+    
+    &.mat-mdc-raised-button {
+      background-color: #bb86fc !important;
+      color: #000000 !important;
+    }
+  }
+  
+  .mat-mdc-radio-button {
+    .mdc-radio__native-control:enabled:checked + .mdc-radio__background .mdc-radio__outer-circle {
+      border-color: #bb86fc !important;
+    }
+    
+    .mdc-radio__native-control:enabled + .mdc-radio__background .mdc-radio__inner-circle {
+      border-color: #bb86fc !important;
+    }
+  }
+  
+  .mat-mdc-progress-spinner {
+    --mdc-circular-progress-active-indicator-color: #bb86fc;
+  }
+}

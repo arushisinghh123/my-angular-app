@@ -1,0 +1,97 @@
+<div class="statistics-container">
+  <div class="statistics-header">
+    <h1 class="statistics-title">Overall Scenario Statistics</h1>
+    <p class="statistics-subtitle">Distribution of scenarios across all sequences</p>
+  </div>
+
+  <div class="statistics-content">
+    <!-- Loading State -->
+    <div class="loading-state" *ngIf="isLoading">
+      <mat-spinner diameter="60"></mat-spinner>
+      <p>Loading scenario statistics...</p>
+    </div>
+
+    <!-- Statistics Display -->
+    <div class="statistics-display" *ngIf="!isLoading && statisticsData.length > 0">
+      <!-- Chart Container -->
+      <div class="chart-container">
+        <div class="chart-wrapper">
+          <canvas 
+            #chartCanvas 
+            class="doughnut-chart"
+            (mousemove)="onChartHover($event)"
+            (mouseleave)="onChartLeave()">
+          </canvas>
+          
+          <!-- Chart Center Info -->
+          <div class="chart-center-info">
+            <div class="total-sequences">
+              <span class="total-number">{{ totalSequences }}</span>
+              <span class="total-label">Total Sequences</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Hover Tooltip -->
+        <div 
+          class="chart-tooltip" 
+          *ngIf="hoveredData"
+          [style.left.px]="tooltipPosition.x"
+          [style.top.px]="tooltipPosition.y">
+          <div class="tooltip-content">
+            <div class="tooltip-header">
+              <div class="tooltip-color" [style.background-color]="hoveredData.color"></div>
+              <span class="tooltip-scenario">{{ hoveredData.scenario }}</span>
+            </div>
+            <div class="tooltip-stats">
+              <div class="tooltip-stat">
+                <span class="stat-label">Sequences:</span>
+                <span class="stat-value">{{ hoveredData.sequenceCount }}</span>
+              </div>
+              <div class="tooltip-stat">
+                <span class="stat-label">Percentage:</span>
+                <span class="stat-value">{{ hoveredData.percentage }}%</span>
+              </div>
+              <div class="tooltip-stat">
+                <span class="stat-label">Frame Fraction:</span>
+                <span class="stat-value">{{ hoveredData.frameFraction }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Legend -->
+      <div class="legend-container">
+        <h3 class="legend-title">Scenario Breakdown</h3>
+        <div class="legend-grid">
+          <div 
+            *ngFor="let stat of statisticsData; trackBy: trackByScenario"
+            class="legend-item"
+            [class.highlighted]="hoveredData?.scenario === stat.scenario"
+            (mouseenter)="onLegendHover(stat)"
+            (mouseleave)="onLegendLeave()">
+            <div class="legend-color" [style.background-color]="stat.color"></div>
+            <div class="legend-info">
+              <span class="legend-scenario">{{ stat.scenario }}</span>
+              <div class="legend-stats">
+                <span class="legend-percentage">{{ stat.percentage }}%</span>
+                <span class="legend-count">({{ stat.sequenceCount }} sequences)</span>
+              </div>
+              <div class="legend-frames">
+                <span class="frames-label">Frame fraction:</span>
+                <span class="frames-value">{{ stat.frameFraction }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- No Data State -->
+    <div class="no-data-state" *ngIf="!isLoading && statisticsData.length === 0">
+      <mat-icon class="no-data-icon">pie_chart</mat-icon>
+      <p>No scenario statistics available</p>
+    </div>
+  </div>
+</div>
