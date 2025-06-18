@@ -95,6 +95,7 @@
   font-size: 18px;
   font-weight: 500;
   color: #333;
+  text-align: center;
 }
 
 .section-subtitle {
@@ -103,6 +104,64 @@
   font-weight: 500;
   color: #333;
   text-align: center;
+}
+
+// Timeline Controls
+.timeline-controls {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 16px;
+  background-color: #f5f5f5;
+  border-radius: 8px;
+  margin-bottom: 16px;
+  gap: 16px;
+}
+
+.zoom-controls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  
+  .zoom-button {
+    width: 36px;
+    height: 36px;
+    transition: all 0.2s ease;
+    
+    &:hover:not([disabled]) {
+      background-color: rgba(0, 0, 0, 0.1);
+      transform: scale(1.1);
+    }
+    
+    &[disabled] {
+      opacity: 0.5;
+    }
+  }
+  
+  .zoom-level {
+    font-size: 12px;
+    font-weight: 500;
+    min-width: 40px;
+    text-align: center;
+    color: #666;
+  }
+}
+
+.scroll-controls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  
+  .scroll-button {
+    width: 36px;
+    height: 36px;
+    transition: all 0.2s ease;
+    
+    &:hover {
+      background-color: rgba(0, 0, 0, 0.1);
+      transform: scale(1.1);
+    }
+  }
 }
 
 // Sequences Section
@@ -116,12 +175,12 @@
 
 .sequences-list-wrapper {
   max-height: 400px;
-  overflow-y: auto;
+  overflow: auto;
   padding-right: 8px;
   
-  // Custom scrollbar styling
   &::-webkit-scrollbar {
     width: 8px;
+    height: 8px;
   }
   
   &::-webkit-scrollbar-track {
@@ -138,7 +197,6 @@
     }
   }
   
-  // Firefox scrollbar
   scrollbar-width: thin;
   scrollbar-color: #c1c1c1 #f1f1f1;
 }
@@ -166,7 +224,7 @@
   }
   
   .sequence-bar {
-    height: 32px; // Increased height (thickness)
+    height: 32px;
     border: 1px solid #ddd;
     border-radius: 6px;
     display: flex;
@@ -189,35 +247,11 @@
       }
       
       &.no-tunnel {
-        background-color: #2196f3; // Blue
+        background-color: #2196f3;
       }
       
       &.tunnel-present {
-        background-color: #f44336; // Red
-      }
-    }
-  }
-  
-  .sequence-controls {
-    display: flex;
-    gap: 4px;
-    
-    .control-btn {
-      width: 32px;
-      height: 32px;
-      
-      .mat-icon {
-        font-size: 18px;
-        width: 18px;
-        height: 18px;
-      }
-      
-      &.zoom-btn {
-        color: #666;
-      }
-      
-      &.nav-btn {
-        color: #666;
+        background-color: #f44336;
       }
     }
   }
@@ -249,13 +283,6 @@
       }
     }
   }
-}
-
-// Timeline Section
-.timeline-section {
-  margin-top: 40px;
-  border-top: 1px solid #e0e0e0;
-  padding-top: 40px;
 }
 
 // Right Column Sections
@@ -414,6 +441,14 @@
     display: flex;
     align-items: center;
     gap: 16px;
+    cursor: pointer;
+    padding: 8px;
+    border-radius: 4px;
+    transition: background-color 0.2s ease;
+    
+    &:hover {
+      background-color: rgba(0, 0, 0, 0.05);
+    }
     
     .summary-label {
       font-weight: 500;
@@ -486,6 +521,24 @@
     color: #ffffff;
   }
   
+  .timeline-controls {
+    background-color: #2d2d2d;
+  }
+  
+  .zoom-level {
+    color: rgba(255, 255, 255, 0.7);
+  }
+  
+  .zoom-button,
+  .scroll-button {
+    color: rgba(255, 255, 255, 0.7);
+    
+    &:hover:not([disabled]) {
+      background-color: rgba(255, 255, 255, 0.1);
+      color: #ffffff;
+    }
+  }
+  
   .left-column {
     background: linear-gradient(135deg, #1e1e1e 0%, #2d2d2d 100%);
     border-right-color: #333;
@@ -504,6 +557,12 @@
   .summary-section-full {
     background: linear-gradient(135deg, #1e1e1e 0%, #2d2d2d 100%);
     border-top-color: #333;
+  }
+  
+  .summary-row {
+    &:hover {
+      background-color: rgba(255, 255, 255, 0.05);
+    }
   }
   
   .sequence-label,
@@ -544,11 +603,11 @@
     
     .bar-segment {
       &.no-tunnel {
-        background: linear-gradient(45deg, #03dac6 0%, #00bcd4 100%); // Vibrant teal
+        background: linear-gradient(45deg, #03dac6 0%, #00bcd4 100%);
       }
       
       &.tunnel-present {
-        background: linear-gradient(45deg, #bb86fc 0%, #9c27b0 100%); // Vibrant purple
+        background: linear-gradient(45deg, #bb86fc 0%, #9c27b0 100%);
       }
     }
   }
@@ -621,6 +680,17 @@
   
   .sequences-list-wrapper {
     max-height: 300px;
+  }
+  
+  .timeline-controls {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+    
+    .zoom-controls,
+    .scroll-controls {
+      justify-content: center;
+    }
   }
 }
 

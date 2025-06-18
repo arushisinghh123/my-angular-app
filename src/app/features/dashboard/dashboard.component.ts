@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, ViewChild, ElementRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormControl } from '@angular/forms';
 import { MatCardModule } from '@angular/material/card';
@@ -18,7 +18,6 @@ import { takeUntil, debounceTime, distinctUntilChanged, startWith, map } from 'r
 import { ScenarioService, Scenario } from '../../core/services/scenario.service';
 import { SequenceService, Sequence } from '../../core/services/sequence.service';
 import { ImageService, FrameMetadata } from '../../core/services/image.service';
-import { TimelineViewerComponent } from '../timeline-viewer/timeline-viewer.component';
 
 interface SequenceSegment {
   start: number;
@@ -42,13 +41,14 @@ interface SequenceSegment {
     MatRadioModule,
     MatProgressSpinnerModule,
     MatTooltipModule,
-    MatAutocompleteModule,
-    TimelineViewerComponent
+    MatAutocompleteModule
   ],
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.scss']
 })
 export class DashboardComponent implements OnInit, OnDestroy {
+  @ViewChild('sequencesScrollContainer') sequencesScrollContainer!: ElementRef<HTMLDivElement>;
+
   scenarioControl = new FormControl<Scenario | null>(null);
   sequenceFilterControl = new FormControl<string | Sequence>('');
   frameControl = new FormControl<number | null>({ value: null, disabled: true });
@@ -68,7 +68,11 @@ export class DashboardComponent implements OnInit, OnDestroy {
   imageLoading = false;
   frameImageLoaded = false;
 
-  sequenceBarWidth = 320;
+  // Timeline zoom and scroll properties
+  zoomLevel = 1;
+  minZoom = 0.5;
+  maxZoom = 3;
+  baseSequenceBarWidth = 320;
 
   private destroy$ = new Subject<void>();
 
@@ -217,14 +221,6 @@ export class DashboardComponent implements OnInit, OnDestroy {
     }
   }
 
-  onTimelineFrameSelected(frameNumber: number): void {
-    if (this.selectedSequenceFromInput) {
-      this.frameControl.setValue(frameNumber);
-      this.loadFrameData(frameNumber, this.selectedSequenceFromInput);
-      this.frameImageLoaded = true;
-    }
-  }
-
   displaySequenceName(sequence: Sequence): string {
     return sequence?.name ?? '';
   }
@@ -238,6 +234,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
     if (newFrame >= 1 && newFrame <= maxFrames) {
       this.frameControl.setValue(newFrame);
       this.loadFrameData(newFrame, this.selectedSequence);
+      this.frameImageLoaded = true;
     }
   }
 
@@ -254,12 +251,69 @@ export class DashboardComponent implements OnInit, OnDestroy {
     console.log('Playing sequence:', this.selectedSequence?.name);
   }
 
+  // Timeline zoom and scroll methods
+  zoomIn(): void {
+    if (this.zoomLevel < this.maxZoom) {
+      const oldScrollLeft = this.sequencesScrollContainer?.nativeElement?.scrollLeft || 0;
+      const oldWidth = this.timelineWidth;
+      
+      this.zoomLevel = Math.min(this.maxZoom, this.zoomLevel + 0.25);
+      
+      setTimeout(() => {
+        if (this.sequencesScrollContainer?.nativeElement && oldWidth > 0) {
+          const newScrollLeft = (oldScrollLeft / oldWidth) * this.timelineWidth;
+          this.sequencesScrollContainer.nativeElement.scrollLeft = newScrollLeft;
+        }
+      }, 0);
+    }
+  }
+
+  zoomOut(): void {
+    if (this.zoomLevel > this.minZoom) {
+      const oldScrollLeft = this.sequencesScrollContainer?.nativeElement?.scrollLeft || 0;
+      const oldWidth = this.timelineWidth;
+      
+      this.zoomLevel = Math.max(this.minZoom, this.zoomLevel - 0.25);
+      
+      setTimeout(() => {
+        if (this.sequencesScrollContainer?.nativeElement && oldWidth > 0) {
+          const newScrollLeft = (oldScrollLeft / oldWidth) * this.timelineWidth;
+          this.sequencesScrollContainer.nativeElement.scrollLeft = newScrollLeft;
+        }
+      }, 0);
+    }
+  }
+
+  scrollTimeline(direction: 'left' | 'right'): void {
+    const scrollAmount = this.sequenceBarWidth * 0.3;
+    if (this.sequencesScrollContainer?.nativeElement) {
+      const el = this.sequencesScrollContainer.nativeElement;
+      const currentScroll = el.scrollLeft;
+      const targetScroll = direction === 'left' 
+        ? Math.max(0, currentScroll - scrollAmount)
+        : Math.min(el.scrollWidth - el.clientWidth, currentScroll + scrollAmount);
+      
+      el.scrollTo({
+        left: targetScroll,
+        behavior: 'smooth'
+      });
+    }
+  }
+
+  get sequenceBarWidth(): number {
+    return this.baseSequenceBarWidth * this.zoomLevel;
+  }
+
+  get timelineWidth(): number {
+    return this.sequenceBarWidth + 200; // Add space for labels
+  }
+
   getSequenceSegments(sequence: Sequence): SequenceSegment[] {
     if (!this.selectedScenario) return [];
 
     const totalFrames = sequence.totalFrames || 1000;
     const segments: SequenceSegment[] = [];
-    const segmentSize = Math.max(1, Math.floor(totalFrames / 40));
+    const segmentSize = Math.max(1, Math.floor(totalFrames / (40 * this.zoomLevel)));
 
     for (let i = 0; i < totalFrames; i += segmentSize) {
       const end = Math.min(i + segmentSize, totalFrames);
@@ -274,6 +328,10 @@ export class DashboardComponent implements OnInit, OnDestroy {
     }
 
     return segments;
+  }
+
+  getSegmentWidth(segment: SequenceSegment): number {
+    return (this.sequenceBarWidth * segment.width) / 100;
   }
 
   private determineSegmentScenarioPresence(start: number, end: number, sequence: Sequence): boolean {
@@ -292,8 +350,19 @@ export class DashboardComponent implements OnInit, OnDestroy {
   }
 
   getSegmentTooltip(segment: SequenceSegment, sequence: Sequence): string {
+    const frameNumber = Math.floor((segment.start + segment.end) / 2);
     const status = segment.hasScenario ? 'Present' : 'Absent';
-    return `Frames ${segment.start}-${segment.end}: ${this.selectedScenario?.name} ${status}`;
+    return `Frame ${frameNumber}: ${this.selectedScenario?.name} ${status}`;
+  }
+
+  getSummaryTooltip(sequence: Sequence): string {
+    if (!this.selectedScenario) return '';
+    
+    const percentage = this.getSequencePercentage(sequence);
+    const totalFrames = sequence.totalFrames || 1000;
+    const scenarioFrames = Math.floor((totalFrames * percentage) / 100);
+    
+    return `${scenarioFrames}/${totalFrames} frames have ${this.selectedScenario.name} present (${percentage}%)`;
   }
 
   onSegmentClick(sequence: Sequence, segment: SequenceSegment): void {
@@ -303,18 +372,6 @@ export class DashboardComponent implements OnInit, OnDestroy {
     this.frameControl.setValue(frameNumber);
     this.loadFrameData(frameNumber, sequence);
     this.frameImageLoaded = true;
-  }
-
-  zoomSequence(sequenceId: string): void {
-    console.log('Zooming sequence:', sequenceId);
-  }
-
-  scrollSequenceLeft(sequenceId: string): void {
-    console.log('Scrolling left:', sequenceId);
-  }
-
-  scrollSequenceRight(sequenceId: string): void {
-    console.log('Scrolling right:', sequenceId);
   }
 
   onImageLoad(): void {

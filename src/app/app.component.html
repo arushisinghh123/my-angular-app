@@ -1,4 +1,15 @@
 <div class="app-container">
+  <!-- Theme Toggle Button -->
+  <div class="theme-toggle-container">
+    <button 
+      mat-icon-button 
+      (click)="toggleTheme()"
+      class="theme-toggle-button"
+      [matTooltip]="isDarkMode ? 'Switch to Light Mode' : 'Switch to Dark Mode'">
+      <mat-icon>{{ isDarkMode ? 'light_mode' : 'dark_mode' }}</mat-icon>
+    </button>
+  </div>
+
   <!-- Tab Navigation -->
   <mat-tab-group class="main-tabs" animationDuration="300ms">
     <mat-tab label="Dashboard">

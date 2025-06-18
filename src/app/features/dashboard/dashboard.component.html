@@ -85,8 +85,48 @@
         <h2 class="section-title">{{ selectedScenario.name }} Presence Across Sequences:</h2>
         
         <div class="sequences-container">
-          <div class="sequences-list-wrapper">
-            <div class="sequences-list" #sequencesList>
+          <!-- Timeline Controls -->
+          <div class="timeline-controls">
+            <div class="zoom-controls">
+              <button 
+                mat-icon-button 
+                (click)="zoomOut()"
+                [disabled]="zoomLevel <= minZoom"
+                matTooltip="Zoom Out"
+                class="zoom-button">
+                <mat-icon>zoom_out</mat-icon>
+              </button>
+              <span class="zoom-level">{{ (zoomLevel * 100) | number:'1.0-0' }}%</span>
+              <button 
+                mat-icon-button 
+                (click)="zoomIn()"
+                [disabled]="zoomLevel >= maxZoom"
+                matTooltip="Zoom In"
+                class="zoom-button">
+                <mat-icon>zoom_in</mat-icon>
+              </button>
+            </div>
+
+            <div class="scroll-controls">
+              <button 
+                mat-icon-button 
+                (click)="scrollTimeline('left')" 
+                matTooltip="Scroll Left"
+                class="scroll-button">
+                <mat-icon>arrow_back</mat-icon>
+              </button>
+              <button 
+                mat-icon-button 
+                (click)="scrollTimeline('right')" 
+                matTooltip="Scroll Right"
+                class="scroll-button">
+                <mat-icon>arrow_forward</mat-icon>
+              </button>
+            </div>
+          </div>
+
+          <div class="sequences-list-wrapper" #sequencesScrollContainer>
+            <div class="sequences-list" [style.width.px]="timelineWidth">
               <div 
                 *ngFor="let sequence of filteredSequences; let i = index"
                 class="sequence-row">
@@ -101,35 +141,11 @@
                       class="bar-segment"
                       [class.tunnel-present]="segment.hasScenario"
                       [class.no-tunnel]="!segment.hasScenario"
-                      [style.width.%]="segment.width"
+                      [style.width.px]="getSegmentWidth(segment)"
                       [matTooltip]="getSegmentTooltip(segment, sequence)"
                       matTooltipPosition="above"
                       (click)="onSegmentClick(sequence, segment)">
                     </div>
-                  </div>
-                  
-                  <div class="sequence-controls">
-                    <button 
-                      mat-icon-button 
-                      class="control-btn zoom-btn"
-                      (click)="zoomSequence(sequence.id)"
-                      matTooltip="Zoom">
-                      <mat-icon>search</mat-icon>
-                    </button>
-                    <button 
-                      mat-icon-button 
-                      class="control-btn nav-btn"
-                      (click)="scrollSequenceLeft(sequence.id)"
-                      matTooltip="Scroll Left">
-                      <mat-icon>keyboard_arrow_left</mat-icon>
-                    </button>
-                    <button 
-                      mat-icon-button 
-                      class="control-btn nav-btn"
-                      (click)="scrollSequenceRight(sequence.id)"
-                      matTooltip="Scroll Right">
-                      <mat-icon>keyboard_arrow_right</mat-icon>
-                    </button>
                   </div>
                 </div>
               </div>
@@ -148,16 +164,6 @@
             <span>{{ selectedScenario.name }} present</span>
           </div>
         </div>
-      </div>
-
-      <!-- Timeline Section -->
-      <div class="timeline-section" *ngIf="selectedSequenceFromInput">
-        <app-timeline-viewer
-          [selectedScenario]="selectedScenario"
-          [selectedSequence]="selectedSequenceFromInput"
-          [selectedFrameNumber]="currentFrame"
-          (frameSelected)="onTimelineFrameSelected($event)">
-        </app-timeline-viewer>
       </div>
     </div>
 
@@ -285,7 +291,9 @@
     <div class="summary-bars">
       <div 
         *ngFor="let sequence of filteredSequences; let i = index"
-        class="summary-row">
+        class="summary-row"
+        [matTooltip]="getSummaryTooltip(sequence)"
+        matTooltipPosition="above">
         <span class="summary-label">Sequence {{ i + 1 }}:</span>
         <div class="summary-bar-container">
           <div 
