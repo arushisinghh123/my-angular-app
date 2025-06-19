@@ -11,6 +11,9 @@ import { MatRadioModule } from '@angular/material/radio';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
+import { MatTabsModule } from '@angular/material/tabs';         // for <mat-tab-group> and <mat-tab>
+import { RouterModule } from '@angular/router';                 // for <router-outlet>
+import { ScenarioStatisticsComponent } from '../scenario-statistics/scenario-statistics.component';
 
 import { Subject, Observable } from 'rxjs';
 import { takeUntil, debounceTime, distinctUntilChanged, startWith, map } from 'rxjs/operators';
@@ -46,6 +49,7 @@ interface TouchState {
   imports: [
     CommonModule,
     ReactiveFormsModule,
+    RouterModule,
     MatCardModule,
     MatSelectModule,
     MatFormFieldModule,
@@ -55,7 +59,9 @@ interface TouchState {
     MatRadioModule,
     MatProgressSpinnerModule,
     MatTooltipModule,
-    MatAutocompleteModule
+    MatAutocompleteModule,
+    MatTabsModule,
+    ScenarioStatisticsComponent
   ],
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.scss']
