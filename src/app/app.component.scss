@@ -78,10 +78,10 @@
     background-color: #1e1e1e;
     
     .mat-mdc-tab {
-      color: #e0e0e0;
+      color: #ffffff !important;
       
       &.mdc-tab--active {
-        color: #bb86fc;
+        color: #bb86fc !important;
       }
     }
     
@@ -90,7 +90,7 @@
     }
     
     .mdc-tab-indicator__content--underline {
-      background-color: #bb86fc;
+      background-color: #bb86fc !important;
     }
   }
 }

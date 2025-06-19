@@ -83,10 +83,6 @@
       <!-- Sequence Bars Section -->
       <div class="sequences-section">
         <h2 class="section-title">{{ selectedScenario.name }} Presence Across Sequences:</h2>
-        
-        <div class="keyboard-instructions">
-          <p>Use keyboard controls: <strong>+/-</strong> to zoom, <strong>←/→</strong> to scroll individual timelines</p>
-        </div>
 
         <div class="sequences-container">
           <div class="sequences-list-wrapper" #sequencesScrollContainer>
@@ -96,7 +92,6 @@
                 class="sequence-row"
                 [attr.data-sequence-index]="i"
                 tabindex="0"
-                (keydown)="onTimelineKeydown($event, i)"
                 (focus)="setActiveTimeline(i)"
                 (blur)="clearActiveTimeline()">
                 <div class="sequence-header">
@@ -108,7 +103,11 @@
                   <div 
                     class="sequence-bar" 
                     [style.width.px]="getTimelineWidth(i)"
-                    [style.transform]="'translateX(' + getTimelineOffset(i) + 'px)'">
+                    [style.transform]="'translateX(' + getTimelineOffset(i) + 'px)'"
+                    (wheel)="onTimelineWheel($event, i)"
+                    (touchstart)="onTouchStart($event, i)"
+                    (touchmove)="onTouchMove($event, i)"
+                    (touchend)="onTouchEnd($event, i)">
                     <div 
                       *ngFor="let segment of getSequenceSegments(sequence, i); trackBy: trackBySegment"
                       class="bar-segment"

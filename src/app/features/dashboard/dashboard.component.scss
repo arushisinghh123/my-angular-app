@@ -106,27 +106,6 @@
   text-align: center;
 }
 
-// Keyboard instructions
-.keyboard-instructions {
-  text-align: center;
-  margin-bottom: 20px;
-  padding: 12px;
-  background-color: #f0f8ff;
-  border-radius: 6px;
-  border-left: 4px solid #2196f3;
-  
-  p {
-    margin: 0;
-    font-size: 14px;
-    color: #555;
-    
-    strong {
-      color: #2196f3;
-      font-weight: 600;
-    }
-  }
-}
-
 // Sequences Section
 .sequences-section {
   margin-bottom: 40px;
@@ -217,6 +196,8 @@
     overflow: hidden;
     background: #f5f5f5;
     transition: all 0.3s ease;
+    touch-action: none;
+    user-select: none;
     
     .bar-segment {
       height: 100%;
@@ -521,19 +502,6 @@
     color: #ffffff !important;
   }
   
-  .keyboard-instructions {
-    background-color: #1a237e;
-    border-left-color: #3f51b5;
-    
-    p {
-      color: #e8eaf6 !important;
-      
-      strong {
-        color: #7986cb !important;
-      }
-    }
-  }
-  
   .left-column {
     background: #1e1e1e;
     border-right-color: #333;
@@ -675,6 +643,14 @@
   .mat-mdc-radio-button {
     .mdc-form-field > label {
       color: #ffffff !important;
+    }
+    
+    .mdc-radio__native-control:enabled:checked + .mdc-radio__background .mdc-radio__outer-circle {
+      border-color: #bb86fc !important;
+    }
+    
+    .mdc-radio__native-control:enabled + .mdc-radio__background .mdc-radio__inner-circle {
+      border-color: #bb86fc !important;
     }
   }
 }

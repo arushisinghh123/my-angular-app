@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, ViewChild, ElementRef, HostListener } from '@angular/core';
+import { Component, OnInit, OnDestroy, ViewChild, ElementRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormControl } from '@angular/forms';
 import { MatCardModule } from '@angular/material/card';
@@ -29,6 +29,15 @@ interface SequenceSegment {
 interface TimelineState {
   zoom: number;
   offset: number;
+}
+
+interface TouchState {
+  startX: number;
+  startY: number;
+  startDistance: number;
+  startZoom: number;
+  startOffset: number;
+  isMultiTouch: boolean;
 }
 
 @Component({
@@ -78,6 +87,9 @@ export class DashboardComponent implements OnInit, OnDestroy {
   activeTimelineIndex: number = -1;
   baseSequenceBarWidth = 320;
 
+  // Touch state for each timeline
+  touchStates: Map<number, TouchState> = new Map();
+
   private destroy$ = new Subject<void>();
 
   constructor(
@@ -102,13 +114,6 @@ export class DashboardComponent implements OnInit, OnDestroy {
   ngOnDestroy(): void {
     this.destroy$.next();
     this.destroy$.complete();
-  }
-
-  @HostListener('document:keydown', ['$event'])
-  onKeyDown(event: KeyboardEvent): void {
-    if (this.activeTimelineIndex >= 0) {
-      this.onTimelineKeydown(event, this.activeTimelineIndex);
-    }
   }
 
   private loadInitialData(): void {
@@ -156,15 +161,8 @@ export class DashboardComponent implements OnInit, OnDestroy {
         this.updateFilteredSequences();
       });
 
-    // Auto-update frame viewer when frame control changes
-    this.frameControl.valueChanges
-      .pipe(debounceTime(300), takeUntil(this.destroy$))
-      .subscribe(frameNumber => {
-        if (frameNumber && this.selectedSequenceFromInput) {
-          this.loadFrameData(frameNumber, this.selectedSequenceFromInput);
-          this.frameImageLoaded = true;
-        }
-      });
+    // Frame control changes should NOT auto-update the viewer
+    // Only manual navigation should update
   }
 
   private _filterSequences(name: string): Sequence[] {
@@ -237,42 +235,92 @@ export class DashboardComponent implements OnInit, OnDestroy {
     this.frameControl.setValue(null);
   }
 
-  // Timeline keyboard controls
-  onTimelineKeydown(event: KeyboardEvent, timelineIndex: number): void {
+  // Touchpad/Trackpad event handlers
+  onTimelineWheel(event: WheelEvent, timelineIndex: number): void {
+    event.preventDefault();
+    
     if (timelineIndex < 0 || timelineIndex >= this.timelineStates.length) return;
 
     const state = this.timelineStates[timelineIndex];
-    let handled = false;
 
-    switch (event.key) {
-      case '+':
-      case '=':
-        // Zoom in
-        state.zoom = Math.min(5, state.zoom * 1.2);
-        handled = true;
-        break;
-      case '-':
-        // Zoom out
-        state.zoom = Math.max(0.2, state.zoom / 1.2);
-        handled = true;
-        break;
-      case 'ArrowLeft':
-        // Scroll left
-        state.offset = Math.max(0, state.offset - 50);
-        handled = true;
-        break;
-      case 'ArrowRight':
-        // Scroll right
-        const maxOffset = Math.max(0, this.getTimelineWidth(timelineIndex) - this.baseSequenceBarWidth);
-        state.offset = Math.min(maxOffset, state.offset + 50);
-        handled = true;
-        break;
+    if (event.ctrlKey || event.metaKey) {
+      // Pinch-to-zoom (Ctrl/Cmd + wheel)
+      const zoomFactor = event.deltaY > 0 ? 0.9 : 1.1;
+      state.zoom = Math.max(0.2, Math.min(5, state.zoom * zoomFactor));
+    } else {
+      // Horizontal scroll
+      const scrollAmount = event.deltaX || event.deltaY;
+      const maxOffset = Math.max(0, this.getTimelineWidth(timelineIndex) - this.baseSequenceBarWidth);
+      state.offset = Math.max(0, Math.min(maxOffset, state.offset + scrollAmount));
     }
+  }
 
-    if (handled) {
-      event.preventDefault();
-      event.stopPropagation();
+  onTouchStart(event: TouchEvent, timelineIndex: number): void {
+    event.preventDefault();
+    
+    if (timelineIndex < 0 || timelineIndex >= this.timelineStates.length) return;
+
+    const touches = event.touches;
+    const state = this.timelineStates[timelineIndex];
+    
+    if (touches.length === 1) {
+      // Single touch - prepare for scrolling
+      this.touchStates.set(timelineIndex, {
+        startX: touches[0].clientX,
+        startY: touches[0].clientY,
+        startDistance: 0,
+        startZoom: state.zoom,
+        startOffset: state.offset,
+        isMultiTouch: false
+      });
+    } else if (touches.length === 2) {
+      // Multi-touch - prepare for pinch-to-zoom
+      const distance = Math.sqrt(
+        Math.pow(touches[1].clientX - touches[0].clientX, 2) +
+        Math.pow(touches[1].clientY - touches[0].clientY, 2)
+      );
+      
+      this.touchStates.set(timelineIndex, {
+        startX: (touches[0].clientX + touches[1].clientX) / 2,
+        startY: (touches[0].clientY + touches[1].clientY) / 2,
+        startDistance: distance,
+        startZoom: state.zoom,
+        startOffset: state.offset,
+        isMultiTouch: true
+      });
     }
+  }
+
+  onTouchMove(event: TouchEvent, timelineIndex: number): void {
+    event.preventDefault();
+    
+    if (timelineIndex < 0 || timelineIndex >= this.timelineStates.length) return;
+
+    const touches = event.touches;
+    const state = this.timelineStates[timelineIndex];
+    const touchState = this.touchStates.get(timelineIndex);
+    
+    if (!touchState) return;
+
+    if (touches.length === 1 && !touchState.isMultiTouch) {
+      // Single touch - horizontal scrolling
+      const deltaX = touchState.startX - touches[0].clientX;
+      const maxOffset = Math.max(0, this.getTimelineWidth(timelineIndex) - this.baseSequenceBarWidth);
+      state.offset = Math.max(0, Math.min(maxOffset, touchState.startOffset + deltaX));
+    } else if (touches.length === 2) {
+      // Multi-touch - pinch-to-zoom
+      const currentDistance = Math.sqrt(
+        Math.pow(touches[1].clientX - touches[0].clientX, 2) +
+        Math.pow(touches[1].clientY - touches[0].clientY, 2)
+      );
+      
+      const zoomFactor = currentDistance / touchState.startDistance;
+      state.zoom = Math.max(0.2, Math.min(5, touchState.startZoom * zoomFactor));
+    }
+  }
+
+  onTouchEnd(event: TouchEvent, timelineIndex: number): void {
+    this.touchStates.delete(timelineIndex);
   }
 
   setActiveTimeline(index: number): void {
@@ -338,7 +386,8 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
     if (newFrame >= 1 && newFrame <= maxFrames) {
       this.frameControl.setValue(newFrame);
-      // Frame will auto-update due to valueChanges subscription
+      this.loadFrameData(newFrame, this.selectedSequence);
+      this.frameImageLoaded = true;
     }
   }
 
@@ -402,13 +451,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
     const frameNumber = Math.floor((segment.start + segment.end) / 2);
     const status = segment.hasScenario ? 'Present' : 'Absent';
     
-    // Calculate frame fraction for tooltip
-    const totalFrames = sequence.totalFrames || 1000;
-    const scenarioData = sequence.scenarios.find(s => s.scenarioId === this.selectedScenario!.id);
-    const percentage = scenarioData ? scenarioData.percentage : 0;
-    const scenarioFrames = Math.floor((totalFrames * percentage) / 100);
-    
-    return `Frame ${frameNumber}: ${this.selectedScenario?.name} ${status}\n${scenarioFrames}/${totalFrames} frames have ${this.selectedScenario?.name} present (${percentage}%)`;
+    return `Frame ${frameNumber}: ${this.selectedScenario?.name} ${status}`;
   }
 
   getSummaryTooltip(sequence: Sequence): string {
@@ -428,7 +471,8 @@ export class DashboardComponent implements OnInit, OnDestroy {
     this.frameControl.setValue(frameNumber);
     this.selectedSequenceFromInput = sequence;
     this.frameControl.enable();
-    // Frame will auto-update due to valueChanges subscription
+    this.loadFrameData(frameNumber, sequence);
+    this.frameImageLoaded = true;
   }
 
   onImageLoad(): void {
