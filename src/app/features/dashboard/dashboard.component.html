@@ -84,67 +84,46 @@
       <div class="sequences-section">
         <h2 class="section-title">{{ selectedScenario.name }} Presence Across Sequences:</h2>
         
+        <div class="keyboard-instructions">
+          <p>Use keyboard controls: <strong>+/-</strong> to zoom, <strong>←/→</strong> to scroll individual timelines</p>
+        </div>
+
         <div class="sequences-container">
-          <!-- Timeline Controls -->
-          <div class="timeline-controls">
-            <div class="zoom-controls">
-              <button 
-                mat-icon-button 
-                (click)="zoomOut()"
-                [disabled]="zoomLevel <= minZoom"
-                matTooltip="Zoom Out"
-                class="zoom-button">
-                <mat-icon>zoom_out</mat-icon>
-              </button>
-              <span class="zoom-level">{{ (zoomLevel * 100) | number:'1.0-0' }}%</span>
-              <button 
-                mat-icon-button 
-                (click)="zoomIn()"
-                [disabled]="zoomLevel >= maxZoom"
-                matTooltip="Zoom In"
-                class="zoom-button">
-                <mat-icon>zoom_in</mat-icon>
-              </button>
-            </div>
-
-            <div class="scroll-controls">
-              <button 
-                mat-icon-button 
-                (click)="scrollTimeline('left')" 
-                matTooltip="Scroll Left"
-                class="scroll-button">
-                <mat-icon>arrow_back</mat-icon>
-              </button>
-              <button 
-                mat-icon-button 
-                (click)="scrollTimeline('right')" 
-                matTooltip="Scroll Right"
-                class="scroll-button">
-                <mat-icon>arrow_forward</mat-icon>
-              </button>
-            </div>
-          </div>
-
           <div class="sequences-list-wrapper" #sequencesScrollContainer>
-            <div class="sequences-list" [style.width.px]="timelineWidth">
+            <div class="sequences-list">
               <div 
                 *ngFor="let sequence of filteredSequences; let i = index"
-                class="sequence-row">
+                class="sequence-row"
+                [attr.data-sequence-index]="i"
+                tabindex="0"
+                (keydown)="onTimelineKeydown($event, i)"
+                (focus)="setActiveTimeline(i)"
+                (blur)="clearActiveTimeline()">
                 <div class="sequence-header">
                   <span class="sequence-label">Sequence {{ i + 1 }}:</span>
+                  <span class="zoom-indicator">{{ getTimelineZoom(i) }}%</span>
                 </div>
                 
                 <div class="sequence-bar-container">
-                  <div class="sequence-bar" [style.width.px]="sequenceBarWidth">
+                  <div 
+                    class="sequence-bar" 
+                    [style.width.px]="getTimelineWidth(i)"
+                    [style.transform]="'translateX(' + getTimelineOffset(i) + 'px)'">
                     <div 
-                      *ngFor="let segment of getSequenceSegments(sequence); trackBy: trackBySegment"
+                      *ngFor="let segment of getSequenceSegments(sequence, i); trackBy: trackBySegment"
                       class="bar-segment"
-                      [class.tunnel-present]="segment.hasScenario"
-                      [class.no-tunnel]="!segment.hasScenario"
-                      [style.width.px]="getSegmentWidth(segment)"
+                      [class.scenario-absent]="!segment.hasScenario"
+                      [class.scenario-present]="segment.hasScenario"
+                      [style.width.px]="getSegmentWidth(segment, i)"
                       [matTooltip]="getSegmentTooltip(segment, sequence)"
                       matTooltipPosition="above"
                       (click)="onSegmentClick(sequence, segment)">
+                      <!-- Progressive image loading based on zoom -->
+                      <div 
+                        *ngIf="shouldShowThumbnail(i, segment)"
+                        class="segment-thumbnail"
+                        [style.background-image]="'url(' + getSegmentThumbnail(segment, sequence) + ')'">
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -156,11 +135,11 @@
         <!-- Legend -->
         <div class="legend">
           <div class="legend-item">
-            <div class="legend-color no-tunnel"></div>
+            <div class="legend-color scenario-absent"></div>
             <span>No {{ selectedScenario.name.toLowerCase() }}</span>
           </div>
           <div class="legend-item">
-            <div class="legend-color tunnel-present"></div>
+            <div class="legend-color scenario-present"></div>
             <span>{{ selectedScenario.name }} present</span>
           </div>
         </div>

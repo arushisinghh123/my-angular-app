@@ -245,74 +245,78 @@
   }
 }
 
-// Enhanced Dark theme support
+// Enhanced Dark theme with better visibility
 :host-context(.dark-theme) {
   .statistics-container {
     background-color: #121212;
   }
   
   .statistics-header {
-    background: linear-gradient(135deg, #1e1e1e 0%, #2d2d2d 100%);
+    background: #1e1e1e;
     border-bottom-color: #333;
   }
   
   .statistics-title {
-    color: #ffffff;
+    color: #ffffff !important;
   }
   
   .statistics-subtitle {
-    color: #b0b0b0;
+    color: #e0e0e0 !important;
   }
   
   .chart-center-info {
     .total-number {
-      color: #ffffff;
+      color: #ffffff !important;
     }
     
     .total-label {
-      color: #b0b0b0;
+      color: #e0e0e0 !important;
     }
   }
   
   .legend-container {
     .legend-title {
-      color: #ffffff;
+      color: #ffffff !important;
     }
   }
   
   .legend-item {
-    background: linear-gradient(135deg, #1e1e1e 0%, #2d2d2d 100%);
+    background: #1e1e1e;
     border: 1px solid #333;
     
     &:hover,
     &.highlighted {
-      border-color: #bb86fc;
-      box-shadow: 0 4px 12px rgba(187, 134, 252, 0.2);
+      border-color: #2196f3;
+      box-shadow: 0 4px 12px rgba(33, 150, 243, 0.2);
     }
     
     .legend-scenario {
-      color: #ffffff;
+      color: #ffffff !important;
     }
     
     .legend-percentage {
-      color: #bb86fc;
+      color: #64b5f6 !important;
     }
     
     .legend-count {
-      color: #b0b0b0;
+      color: #e0e0e0 !important;
     }
     
     .frames-label {
-      color: #b0b0b0;
+      color: #e0e0e0 !important;
     }
     
     .frames-value {
-      color: #ffffff;
+      color: #ffffff !important;
     }
   }
   
   .no-data-state {
-    color: #888;
+    color: #888 !important;
+  }
+  
+  .loading-state {
+    color: #e0e0e0 !important;
   }
 }
 
