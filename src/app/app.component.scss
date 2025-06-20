@@ -58,7 +58,7 @@
   min-height: calc(100vh - 48px);
 }
 
-// Enhanced Dark theme support
+// Enhanced Dark theme support with better text visibility
 :host-context(.dark-theme) {
   .app-container {
     background-color: #121212;
@@ -83,6 +83,14 @@
       &.mdc-tab--active {
         color: #bb86fc !important;
       }
+      
+      .mdc-tab__text-label {
+        color: #ffffff !important;
+      }
+      
+      &.mdc-tab--active .mdc-tab__text-label {
+        color: #bb86fc !important;
+      }
     }
     
     .mat-mdc-tab-header {
@@ -91,6 +99,37 @@
     
     .mdc-tab-indicator__content--underline {
       background-color: #bb86fc !important;
+    }
+  }
+  
+  // Fix radio button text visibility
+  ::ng-deep .mat-mdc-radio-button {
+    .mdc-form-field {
+      color: #ffffff !important;
+      
+      label {
+        color: #ffffff !important;
+      }
+    }
+    
+    .mdc-radio__native-control:enabled:checked + .mdc-radio__background .mdc-radio__outer-circle {
+      border-color: #bb86fc !important;
+    }
+    
+    .mdc-radio__native-control:enabled + .mdc-radio__background .mdc-radio__inner-circle {
+      border-color: #bb86fc !important;
+    }
+    
+    .mdc-radio__native-control:enabled:checked + .mdc-radio__background .mdc-radio__inner-circle {
+      border-color: #bb86fc !important;
+      background-color: #bb86fc !important;
+    }
+  }
+  
+  // Fix all text elements in dark mode
+  * {
+    &:not(.mat-icon):not(.material-icons) {
+      color: inherit;
     }
   }
 }

@@ -186,10 +186,11 @@
     align-items: center;
     gap: 12px;
     overflow: hidden;
+    position: relative;
   }
   
   .sequence-bar {
-    height: 32px;
+    height: 40px; // Increased height for better visibility
     border: 1px solid #ddd;
     border-radius: 6px;
     display: flex;
@@ -198,6 +199,7 @@
     transition: all 0.3s ease;
     touch-action: none;
     user-select: none;
+    min-width: 100%; // Allow timeline to extend beyond container
     
     .bar-segment {
       height: 100%;
@@ -205,6 +207,7 @@
       transition: all 0.2s ease;
       border-right: 1px solid rgba(255, 255, 255, 0.3);
       position: relative;
+      min-width: 2px; // Ensure segments are visible when zoomed
       
       &:hover {
         opacity: 0.8;
@@ -225,14 +228,19 @@
       
       .segment-thumbnail {
         position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
+        top: 2px;
+        left: 2px;
+        right: 2px;
+        bottom: 2px;
         background-size: cover;
         background-position: center;
-        opacity: 0.7;
-        border-radius: 2px;
+        opacity: 0.8;
+        border-radius: 3px;
+        transition: opacity 0.2s ease;
+        
+        &:hover {
+          opacity: 1;
+        }
       }
     }
   }

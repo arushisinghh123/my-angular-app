@@ -27,6 +27,7 @@ interface SequenceSegment {
   end: number;
   hasScenario: boolean;
   width: number;
+  frameNumber: number; // Add individual frame number
 }
 
 interface TimelineState {
@@ -241,7 +242,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
     this.frameControl.setValue(null);
   }
 
-  // Touchpad/Trackpad event handlers
+  // Enhanced touchpad/trackpad event handlers
   onTimelineWheel(event: WheelEvent, timelineIndex: number): void {
     event.preventDefault();
     
@@ -251,13 +252,25 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
     if (event.ctrlKey || event.metaKey) {
       // Pinch-to-zoom (Ctrl/Cmd + wheel)
-      const zoomFactor = event.deltaY > 0 ? 0.9 : 1.1;
-      state.zoom = Math.max(0.2, Math.min(5, state.zoom * zoomFactor));
+      const zoomFactor = event.deltaY > 0 ? 0.8 : 1.25;
+      const newZoom = Math.max(0.5, Math.min(20, state.zoom * zoomFactor));
+      
+      // Adjust offset to zoom towards mouse position
+      const rect = (event.target as HTMLElement).getBoundingClientRect();
+      const mouseX = event.clientX - rect.left;
+      const zoomPoint = (mouseX + state.offset) / this.getTimelineWidth(timelineIndex);
+      
+      state.zoom = newZoom;
+      const newWidth = this.getTimelineWidth(timelineIndex);
+      state.offset = Math.max(0, Math.min(
+        newWidth - this.baseSequenceBarWidth,
+        zoomPoint * newWidth - mouseX
+      ));
     } else {
       // Horizontal scroll
       const scrollAmount = event.deltaX || event.deltaY;
       const maxOffset = Math.max(0, this.getTimelineWidth(timelineIndex) - this.baseSequenceBarWidth);
-      state.offset = Math.max(0, Math.min(maxOffset, state.offset + scrollAmount));
+      state.offset = Math.max(0, Math.min(maxOffset, state.offset + scrollAmount * 2));
     }
   }
 
@@ -321,7 +334,19 @@ export class DashboardComponent implements OnInit, OnDestroy {
       );
       
       const zoomFactor = currentDistance / touchState.startDistance;
-      state.zoom = Math.max(0.2, Math.min(5, touchState.startZoom * zoomFactor));
+      const newZoom = Math.max(0.5, Math.min(20, touchState.startZoom * zoomFactor));
+      
+      state.zoom = newZoom;
+      
+      // Adjust offset for zoom center
+      const centerX = (touches[0].clientX + touches[1].clientX) / 2;
+      const rect = (event.target as HTMLElement).getBoundingClientRect();
+      const relativeX = centerX - rect.left;
+      const zoomPoint = (relativeX + touchState.startOffset) / (this.baseSequenceBarWidth * touchState.startZoom);
+      
+      const newWidth = this.getTimelineWidth(timelineIndex);
+      const maxOffset = Math.max(0, newWidth - this.baseSequenceBarWidth);
+      state.offset = Math.max(0, Math.min(maxOffset, zoomPoint * newWidth - relativeX));
     }
   }
 
@@ -355,11 +380,11 @@ export class DashboardComponent implements OnInit, OnDestroy {
   shouldShowThumbnail(timelineIndex: number, segment: SequenceSegment): boolean {
     if (timelineIndex >= this.timelineStates.length) return false;
     const zoom = this.timelineStates[timelineIndex].zoom;
-    return zoom > 2; // Show thumbnails when zoomed in beyond 200%
+    return zoom > 3; // Show thumbnails when zoomed in beyond 300%
   }
 
   getSegmentThumbnail(segment: SequenceSegment, sequence: Sequence): string {
-    const frameNumber = Math.floor((segment.start + segment.end) / 2);
+    const frameNumber = segment.frameNumber;
     const hash = frameNumber % 12;
     const imageIds = [
       '378570', '1105766', '2253275', '210019', '1059040', '125510',
@@ -416,17 +441,23 @@ export class DashboardComponent implements OnInit, OnDestroy {
     const totalFrames = sequence.totalFrames || 1000;
     const segments: SequenceSegment[] = [];
     const zoom = this.timelineStates[timelineIndex].zoom;
-    const segmentSize = Math.max(1, Math.floor(totalFrames / (40 * zoom)));
+    
+    // Calculate segment size based on zoom level - more segments when zoomed in
+    const baseSegments = 50;
+    const segmentCount = Math.min(totalFrames, Math.floor(baseSegments * zoom));
+    const segmentSize = Math.max(1, Math.floor(totalFrames / segmentCount));
 
     for (let i = 0; i < totalFrames; i += segmentSize) {
       const end = Math.min(i + segmentSize, totalFrames);
+      const frameNumber = Math.floor((i + end) / 2); // Individual frame number
       const hasScenario = this.determineSegmentScenarioPresence(i, end, sequence);
 
       segments.push({
         start: i,
         end,
         hasScenario,
-        width: ((end - i) / totalFrames) * 100
+        width: ((end - i) / totalFrames) * 100,
+        frameNumber
       });
     }
 
@@ -435,7 +466,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
   getSegmentWidth(segment: SequenceSegment, timelineIndex: number): number {
     const timelineWidth = this.getTimelineWidth(timelineIndex);
-    return (timelineWidth * segment.width) / 100;
+    return Math.max(2, (timelineWidth * segment.width) / 100); // Minimum 2px width
   }
 
   private determineSegmentScenarioPresence(start: number, end: number, sequence: Sequence): boolean {
@@ -454,10 +485,8 @@ export class DashboardComponent implements OnInit, OnDestroy {
   }
 
   getSegmentTooltip(segment: SequenceSegment, sequence: Sequence): string {
-    const frameNumber = Math.floor((segment.start + segment.end) / 2);
     const status = segment.hasScenario ? 'Present' : 'Absent';
-    
-    return `Frame ${frameNumber}: ${this.selectedScenario?.name} ${status}`;
+    return `Frame ${segment.frameNumber}: ${this.selectedScenario?.name} ${status}`;
   }
 
   getSummaryTooltip(sequence: Sequence): string {
@@ -473,7 +502,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
   onSegmentClick(sequence: Sequence, segment: SequenceSegment): void {
     if (!this.selectedScenario) return;
 
-    const frameNumber = Math.floor((segment.start + segment.end) / 2);
+    const frameNumber = segment.frameNumber;
     this.frameControl.setValue(frameNumber);
     this.selectedSequenceFromInput = sequence;
     this.frameControl.enable();
