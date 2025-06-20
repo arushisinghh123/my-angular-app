@@ -103,7 +103,8 @@
                   <div 
                     class="sequence-bar" 
                     [style.width.px]="getTimelineWidth(i)"
-                    [style.transform]="'translateX(' + getTimelineOffset(i) + 'px)'"
+                    [style.transform]="'translateX(' + getTimelineOffset(i) + 'px) scale(' + getTimelineScale(i) + ')'"
+                    [style.transform-origin]="'left center'"
                     (wheel)="onTimelineWheel($event, i)"
                     (touchstart)="onTouchStart($event, i)"
                     (touchmove)="onTouchMove($event, i)"

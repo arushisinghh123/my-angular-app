@@ -27,12 +27,13 @@ interface SequenceSegment {
   end: number;
   hasScenario: boolean;
   width: number;
-  frameNumber: number; // Add individual frame number
+  frameNumber: number; // Individual frame number
 }
 
 interface TimelineState {
   zoom: number;
   offset: number;
+  scale: number; // CSS transform scale for visual scaling
 }
 
 interface TouchState {
@@ -41,6 +42,7 @@ interface TouchState {
   startDistance: number;
   startZoom: number;
   startOffset: number;
+  startScale: number;
   isMultiTouch: boolean;
 }
 
@@ -89,7 +91,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
   imageLoading = false;
   frameImageLoaded = false;
 
-  // Individual timeline states
+  // Individual timeline states with scaling
   timelineStates: TimelineState[] = [];
   activeTimelineIndex: number = -1;
   baseSequenceBarWidth = 320;
@@ -205,10 +207,11 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
     this.filteredSequences = filtered;
     
-    // Initialize timeline states for each sequence
+    // Initialize timeline states for each sequence with scaling
     this.timelineStates = filtered.map(() => ({
       zoom: 1,
-      offset: 0
+      offset: 0,
+      scale: 1 // CSS transform scale
     }));
   }
 
@@ -242,7 +245,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
     this.frameControl.setValue(null);
   }
 
-  // Enhanced touchpad/trackpad event handlers
+  // Enhanced touchpad/trackpad event handlers with proper scaling
   onTimelineWheel(event: WheelEvent, timelineIndex: number): void {
     event.preventDefault();
     
@@ -251,26 +254,31 @@ export class DashboardComponent implements OnInit, OnDestroy {
     const state = this.timelineStates[timelineIndex];
 
     if (event.ctrlKey || event.metaKey) {
-      // Pinch-to-zoom (Ctrl/Cmd + wheel)
-      const zoomFactor = event.deltaY > 0 ? 0.8 : 1.25;
-      const newZoom = Math.max(0.5, Math.min(20, state.zoom * zoomFactor));
+      // Pinch-to-zoom with visual scaling
+      const zoomFactor = event.deltaY > 0 ? 0.85 : 1.18;
+      const newZoom = Math.max(0.5, Math.min(10, state.zoom * zoomFactor));
+      const newScale = Math.max(1, Math.min(4, state.scale * zoomFactor));
       
-      // Adjust offset to zoom towards mouse position
+      // Get mouse position relative to timeline
       const rect = (event.target as HTMLElement).getBoundingClientRect();
       const mouseX = event.clientX - rect.left;
-      const zoomPoint = (mouseX + state.offset) / this.getTimelineWidth(timelineIndex);
+      
+      // Calculate zoom point
+      const zoomPoint = (mouseX + state.offset) / (this.baseSequenceBarWidth * state.scale);
       
       state.zoom = newZoom;
+      state.scale = newScale;
+      
+      // Adjust offset to zoom towards mouse position
       const newWidth = this.getTimelineWidth(timelineIndex);
-      state.offset = Math.max(0, Math.min(
-        newWidth - this.baseSequenceBarWidth,
-        zoomPoint * newWidth - mouseX
-      ));
+      const containerWidth = this.baseSequenceBarWidth;
+      const maxOffset = Math.max(0, newWidth - containerWidth);
+      state.offset = Math.max(0, Math.min(maxOffset, zoomPoint * newWidth - mouseX));
     } else {
       // Horizontal scroll
-      const scrollAmount = event.deltaX || event.deltaY;
+      const scrollAmount = (event.deltaX || event.deltaY) * 2;
       const maxOffset = Math.max(0, this.getTimelineWidth(timelineIndex) - this.baseSequenceBarWidth);
-      state.offset = Math.max(0, Math.min(maxOffset, state.offset + scrollAmount * 2));
+      state.offset = Math.max(0, Math.min(maxOffset, state.offset + scrollAmount));
     }
   }
 
@@ -290,6 +298,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
         startDistance: 0,
         startZoom: state.zoom,
         startOffset: state.offset,
+        startScale: state.scale,
         isMultiTouch: false
       });
     } else if (touches.length === 2) {
@@ -305,6 +314,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
         startDistance: distance,
         startZoom: state.zoom,
         startOffset: state.offset,
+        startScale: state.scale,
         isMultiTouch: true
       });
     }
@@ -327,22 +337,24 @@ export class DashboardComponent implements OnInit, OnDestroy {
       const maxOffset = Math.max(0, this.getTimelineWidth(timelineIndex) - this.baseSequenceBarWidth);
       state.offset = Math.max(0, Math.min(maxOffset, touchState.startOffset + deltaX));
     } else if (touches.length === 2) {
-      // Multi-touch - pinch-to-zoom
+      // Multi-touch - pinch-to-zoom with scaling
       const currentDistance = Math.sqrt(
         Math.pow(touches[1].clientX - touches[0].clientX, 2) +
         Math.pow(touches[1].clientY - touches[0].clientY, 2)
       );
       
       const zoomFactor = currentDistance / touchState.startDistance;
-      const newZoom = Math.max(0.5, Math.min(20, touchState.startZoom * zoomFactor));
+      const newZoom = Math.max(0.5, Math.min(10, touchState.startZoom * zoomFactor));
+      const newScale = Math.max(1, Math.min(4, touchState.startScale * zoomFactor));
       
       state.zoom = newZoom;
+      state.scale = newScale;
       
       // Adjust offset for zoom center
       const centerX = (touches[0].clientX + touches[1].clientX) / 2;
       const rect = (event.target as HTMLElement).getBoundingClientRect();
       const relativeX = centerX - rect.left;
-      const zoomPoint = (relativeX + touchState.startOffset) / (this.baseSequenceBarWidth * touchState.startZoom);
+      const zoomPoint = (relativeX + touchState.startOffset) / (this.baseSequenceBarWidth * touchState.startScale);
       
       const newWidth = this.getTimelineWidth(timelineIndex);
       const maxOffset = Math.max(0, newWidth - this.baseSequenceBarWidth);
@@ -369,7 +381,8 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
   getTimelineWidth(timelineIndex: number): number {
     if (timelineIndex >= this.timelineStates.length) return this.baseSequenceBarWidth;
-    return this.baseSequenceBarWidth * this.timelineStates[timelineIndex].zoom;
+    const state = this.timelineStates[timelineIndex];
+    return this.baseSequenceBarWidth * state.zoom * state.scale;
   }
 
   getTimelineOffset(timelineIndex: number): number {
@@ -377,10 +390,15 @@ export class DashboardComponent implements OnInit, OnDestroy {
     return -this.timelineStates[timelineIndex].offset;
   }
 
+  getTimelineScale(timelineIndex: number): number {
+    if (timelineIndex >= this.timelineStates.length) return 1;
+    return this.timelineStates[timelineIndex].scale;
+  }
+
   shouldShowThumbnail(timelineIndex: number, segment: SequenceSegment): boolean {
     if (timelineIndex >= this.timelineStates.length) return false;
-    const zoom = this.timelineStates[timelineIndex].zoom;
-    return zoom > 3; // Show thumbnails when zoomed in beyond 300%
+    const state = this.timelineStates[timelineIndex];
+    return state.zoom * state.scale > 4; // Show thumbnails when significantly zoomed
   }
 
   getSegmentThumbnail(segment: SequenceSegment, sequence: Sequence): string {
@@ -440,11 +458,12 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
     const totalFrames = sequence.totalFrames || 1000;
     const segments: SequenceSegment[] = [];
-    const zoom = this.timelineStates[timelineIndex].zoom;
+    const state = this.timelineStates[timelineIndex];
     
-    // Calculate segment size based on zoom level - more segments when zoomed in
+    // Calculate segment count based on zoom and scale - more segments when zoomed
     const baseSegments = 50;
-    const segmentCount = Math.min(totalFrames, Math.floor(baseSegments * zoom));
+    const zoomFactor = state.zoom * state.scale;
+    const segmentCount = Math.min(totalFrames, Math.floor(baseSegments * Math.max(1, zoomFactor / 2)));
     const segmentSize = Math.max(1, Math.floor(totalFrames / segmentCount));
 
     for (let i = 0; i < totalFrames; i += segmentSize) {
@@ -466,7 +485,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
   getSegmentWidth(segment: SequenceSegment, timelineIndex: number): number {
     const timelineWidth = this.getTimelineWidth(timelineIndex);
-    return Math.max(2, (timelineWidth * segment.width) / 100); // Minimum 2px width
+    return Math.max(1, (timelineWidth * segment.width) / 100); // Minimum 1px width
   }
 
   private determineSegmentScenarioPresence(start: number, end: number, sequence: Sequence): boolean {
