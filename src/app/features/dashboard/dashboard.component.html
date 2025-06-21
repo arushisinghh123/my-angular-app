@@ -114,6 +114,7 @@
                       class="bar-segment"
                       [class.scenario-absent]="!segment.hasScenario"
                       [class.scenario-present]="segment.hasScenario"
+                      [class]="getSegmentZoomClass(i)"
                       [style.width.px]="getSegmentWidth(segment, i)"
                       [matTooltip]="getSegmentTooltip(segment, sequence)"
                       matTooltipPosition="above"
@@ -122,6 +123,7 @@
                       <div 
                         *ngIf="shouldShowThumbnail(i, segment)"
                         class="segment-thumbnail"
+                        [class]="getSegmentZoomClass(i)"
                         [style.background-image]="'url(' + getSegmentThumbnail(segment, sequence) + ')'">
                       </div>
                     </div>

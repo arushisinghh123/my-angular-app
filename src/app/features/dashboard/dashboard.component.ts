@@ -398,7 +398,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
   shouldShowThumbnail(timelineIndex: number, segment: SequenceSegment): boolean {
     if (timelineIndex >= this.timelineStates.length) return false;
     const state = this.timelineStates[timelineIndex];
-    return state.zoom * state.scale > 4; // Show thumbnails when significantly zoomed
+    return state.zoom * state.scale > 1.5; // Show thumbnails when zoomed
   }
 
   getSegmentThumbnail(segment: SequenceSegment, sequence: Sequence): string {
@@ -409,6 +409,24 @@ export class DashboardComponent implements OnInit, OnDestroy {
       '1118873', '2448749', '315938', '1108099', '2885320', '3593922'
     ];
     return `https://images.pexels.com/photos/${imageIds[hash]}/pexels-photo-${imageIds[hash]}.jpeg?auto=compress&cs=tinysrgb&w=120&h=80&fit=crop`;
+  }
+
+  // Get zoom-based CSS classes for progressive visual transition
+  getSegmentZoomClass(timelineIndex: number): string {
+    if (timelineIndex >= this.timelineStates.length) return 'zoom-low';
+    
+    const state = this.timelineStates[timelineIndex];
+    const totalZoom = state.zoom * state.scale;
+    
+    if (totalZoom < 1.5) {
+      return 'zoom-low';
+    } else if (totalZoom < 2.5) {
+      return 'zoom-medium';
+    } else if (totalZoom < 4) {
+      return 'zoom-high';
+    } else {
+      return 'zoom-very-high';
+    }
   }
 
   canGoToFrame(): boolean {
