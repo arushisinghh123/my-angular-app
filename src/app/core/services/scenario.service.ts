@@ -17,7 +17,10 @@ export class ScenarioService {
     { id: '3', name: 'Tunnel', description: 'Driving through tunnels' },
     { id: '4', name: 'Rain', description: 'Wet weather conditions' },
     { id: '5', name: 'Highway', description: 'High-speed highway driving' },
-    { id: '6', name: 'Country Road', description: 'Rural and countryside driving' }
+    { id: '6', name: 'Country Road', description: 'Rural and countryside driving' },
+    { id: '7', name: 'Snowfall', description: 'Snow weather conditions' },
+    { id: '8', name: 'Ice', description: 'Icy road conditions' },
+    { id: '9', name: 'StandingCloseToExtendedObject', description: 'Standing close to extended objects' }
   ];
 
   constructor() {}

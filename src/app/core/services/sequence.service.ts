@@ -21,7 +21,7 @@ export class SequenceService {
       description: 'Daily morning drive to work',
       scenarios: [
         { scenarioId: '2', percentage: 85 },
-        { scenarioId: '10', percentage: 70 },
+        { scenarioId: '1', percentage: 70 },
         { scenarioId: '4', percentage: 45 }
       ]
     },
@@ -31,7 +31,7 @@ export class SequenceService {
       totalFrames: 2000,
       description: 'Long distance highway travel',
       scenarios: [
-        { scenarioId: '4', percentage: 95 },
+        { scenarioId: '5', percentage: 95 },
         { scenarioId: '7', percentage: 30 },
         { scenarioId: '9', percentage: 25 }
       ]
@@ -42,9 +42,9 @@ export class SequenceService {
       totalFrames: 800,
       description: 'Underground tunnel navigation',
       scenarios: [
-        { scenarioId: '1', percentage: 100 },
+        { scenarioId: '3', percentage: 100 },
         { scenarioId: '2', percentage: 40 },
-        { scenarioId: '5', percentage: 60 }
+        { scenarioId: '1', percentage: 60 }
       ]
     },
     {
@@ -53,9 +53,9 @@ export class SequenceService {
       totalFrames: 950,
       description: 'Driving in wet conditions',
       scenarios: [
-        { scenarioId: '3', percentage: 100 },
+        { scenarioId: '4', percentage: 100 },
         { scenarioId: '2', percentage: 65 },
-        { scenarioId: '10', percentage: 55 }
+        { scenarioId: '1', percentage: 55 }
       ]
     },
     {
@@ -64,8 +64,8 @@ export class SequenceService {
       totalFrames: 1100,
       description: 'Evening and night driving',
       scenarios: [
-        { scenarioId: '5', percentage: 100 },
-        { scenarioId: '4', percentage: 70 },
+        { scenarioId: '1', percentage: 100 },
+        { scenarioId: '5', percentage: 70 },
         { scenarioId: '9', percentage: 50 }
       ]
     },
@@ -75,9 +75,9 @@ export class SequenceService {
       totalFrames: 1300,
       description: 'Snow and ice driving',
       scenarios: [
-        { scenarioId: '6', percentage: 100 },
-        { scenarioId: '9', percentage: 60 },
-        { scenarioId: '4', percentage: 40 }
+        { scenarioId: '7', percentage: 100 },
+        { scenarioId: '8', percentage: 80 },
+        { scenarioId: '5', percentage: 40 }
       ]
     },
     {
@@ -86,9 +86,9 @@ export class SequenceService {
       totalFrames: 900,
       description: 'Navigating through work zones',
       scenarios: [
-        { scenarioId: '7', percentage: 100 },
-        { scenarioId: '4', percentage: 80 },
-        { scenarioId: '10', percentage: 75 }
+        { scenarioId: '9', percentage: 100 },
+        { scenarioId: '5', percentage: 80 },
+        { scenarioId: '1', percentage: 75 }
       ]
     },
     {
@@ -97,9 +97,9 @@ export class SequenceService {
       totalFrames: 750,
       description: 'Mall and shopping area driving',
       scenarios: [
-        { scenarioId: '8', percentage: 90 },
+        { scenarioId: '1', percentage: 90 },
         { scenarioId: '2', percentage: 70 },
-        { scenarioId: '10', percentage: 60 }
+        { scenarioId: '9', percentage: 60 }
       ]
     },
     {
@@ -108,9 +108,9 @@ export class SequenceService {
       totalFrames: 1250,
       description: 'Rural and countryside driving',
       scenarios: [
-        { scenarioId: '9', percentage: 100 },
-        { scenarioId: '5', percentage: 45 },
-        { scenarioId: '6', percentage: 35 }
+        { scenarioId: '6', percentage: 100 },
+        { scenarioId: '2', percentage: 45 },
+        { scenarioId: '7', percentage: 35 }
       ]
     },
     {
@@ -119,9 +119,9 @@ export class SequenceService {
       totalFrames: 1400,
       description: 'Peak traffic hours',
       scenarios: [
-        { scenarioId: '10', percentage: 100 },
+        { scenarioId: '1', percentage: 100 },
         { scenarioId: '2', percentage: 90 },
-        { scenarioId: '7', percentage: 40 }
+        { scenarioId: '9', percentage: 40 }
       ]
     },
     {
@@ -130,9 +130,9 @@ export class SequenceService {
       totalFrames: 1600,
       description: 'Leisure weekend driving',
       scenarios: [
-        { scenarioId: '4', percentage: 60 },
-        { scenarioId: '9', percentage: 70 },
-        { scenarioId: '8', percentage: 50 }
+        { scenarioId: '5', percentage: 60 },
+        { scenarioId: '6', percentage: 70 },
+        { scenarioId: '1', percentage: 50 }
       ]
     },
     {
@@ -142,8 +142,30 @@ export class SequenceService {
       description: 'Urgent driving scenarios',
       scenarios: [
         { scenarioId: '2', percentage: 80 },
-        { scenarioId: '4', percentage: 70 },
-        { scenarioId: '10', percentage: 85 }
+        { scenarioId: '5', percentage: 70 },
+        { scenarioId: '1', percentage: 85 }
+      ]
+    },
+    {
+      id: '13',
+      name: 'Icy Road Drive',
+      totalFrames: 1150,
+      description: 'Driving on icy conditions',
+      scenarios: [
+        { scenarioId: '8', percentage: 100 },
+        { scenarioId: '7', percentage: 60 },
+        { scenarioId: '6', percentage: 40 }
+      ]
+    },
+    {
+      id: '14',
+      name: 'Extended Object Navigation',
+      totalFrames: 850,
+      description: 'Navigating around extended objects',
+      scenarios: [
+        { scenarioId: '9', percentage: 100 },
+        { scenarioId: '1', percentage: 70 },
+        { scenarioId: '5', percentage: 30 }
       ]
     }
   ];

@@ -34,8 +34,6 @@ export class ScenarioStatisticsComponent implements OnInit, OnDestroy {
   statisticsData: ScenarioStatistic[] = [];
   isLoading = true;
   totalSequences = 0;
-  hoveredData: ScenarioStatistic | null = null;
-  tooltipPosition = { x: 0, y: 0 };
 
   private destroy$ = new Subject<void>();
   private chart: any = null;
@@ -51,7 +49,10 @@ export class ScenarioStatisticsComponent implements OnInit, OnDestroy {
     '#ffb74d', // Orange
     '#f06292', // Pink
     '#9575cd', // Deep Purple
-    '#4db6ac'  // Teal
+    '#4db6ac', // Teal
+    '#a5d6a7', // Light Green
+    '#ffcc02', // Yellow
+    '#ff8a65'  // Deep Orange
   ];
 
   constructor(
@@ -116,8 +117,8 @@ export class ScenarioStatisticsComponent implements OnInit, OnDestroy {
       });
 
       const frameFraction = totalFrames > 0 ? 
-        `${scenarioFrames}/${totalFrames} (${((scenarioFrames / totalFrames) * 100).toFixed(1)}%)` : 
-        '0/0 (0%)';
+        `${scenarioFrames}/${totalFrames}` : 
+        '0/0';
 
       return {
         scenario: scenario.name,
@@ -171,50 +172,6 @@ export class ScenarioStatisticsComponent implements OnInit, OnDestroy {
 
       currentAngle += sliceAngle;
     });
-  }
-
-  onChartHover(event: MouseEvent): void {
-    const canvas = this.chartCanvas.nativeElement;
-    const rect = canvas.getBoundingClientRect();
-    const x = event.clientX - rect.left;
-    const y = event.clientY - rect.top;
-
-    const centerX = canvas.width / 2;
-    const centerY = canvas.height / 2;
-    const outerRadius = Math.min(canvas.width, canvas.height) / 2 - 20;
-    const innerRadius = outerRadius * 0.6;
-
-    const distance = Math.sqrt((x - centerX) ** 2 + (y - centerY) ** 2);
-    
-    if (distance >= innerRadius && distance <= outerRadius) {
-      const angle = Math.atan2(y - centerY, x - centerX);
-      const normalizedAngle = (angle + Math.PI / 2 + 2 * Math.PI) % (2 * Math.PI);
-      
-      let currentAngle = 0;
-      for (const data of this.statisticsData) {
-        const sliceAngle = (data.percentage / 100) * 2 * Math.PI;
-        if (normalizedAngle >= currentAngle && normalizedAngle <= currentAngle + sliceAngle) {
-          this.hoveredData = data;
-          this.tooltipPosition = { x: event.clientX + 10, y: event.clientY - 10 };
-          return;
-        }
-        currentAngle += sliceAngle;
-      }
-    }
-    
-    this.hoveredData = null;
-  }
-
-  onChartLeave(): void {
-    this.hoveredData = null;
-  }
-
-  onLegendHover(data: ScenarioStatistic): void {
-    this.hoveredData = data;
-  }
-
-  onLegendLeave(): void {
-    this.hoveredData = null;
   }
 
   trackByScenario(index: number, item: ScenarioStatistic): string {

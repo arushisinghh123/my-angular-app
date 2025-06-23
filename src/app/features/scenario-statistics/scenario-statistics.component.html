@@ -18,9 +18,7 @@
         <div class="chart-wrapper">
           <canvas 
             #chartCanvas 
-            class="doughnut-chart"
-            (mousemove)="onChartHover($event)"
-            (mouseleave)="onChartLeave()">
+            class="doughnut-chart">
           </canvas>
           
           <!-- Chart Center Info -->
@@ -28,34 +26,6 @@
             <div class="total-sequences">
               <span class="total-number">{{ totalSequences }}</span>
               <span class="total-label">Total Sequences</span>
-            </div>
-          </div>
-        </div>
-
-        <!-- Hover Tooltip -->
-        <div 
-          class="chart-tooltip" 
-          *ngIf="hoveredData"
-          [style.left.px]="tooltipPosition.x"
-          [style.top.px]="tooltipPosition.y">
-          <div class="tooltip-content">
-            <div class="tooltip-header">
-              <div class="tooltip-color" [style.background-color]="hoveredData.color"></div>
-              <span class="tooltip-scenario">{{ hoveredData.scenario }}</span>
-            </div>
-            <div class="tooltip-stats">
-              <div class="tooltip-stat">
-                <span class="stat-label">Sequences:</span>
-                <span class="stat-value">{{ hoveredData.sequenceCount }}</span>
-              </div>
-              <div class="tooltip-stat">
-                <span class="stat-label">Percentage:</span>
-                <span class="stat-value">{{ hoveredData.percentage }}%</span>
-              </div>
-              <div class="tooltip-stat">
-                <span class="stat-label">Frame Fraction:</span>
-                <span class="stat-value">{{ hoveredData.frameFraction }}</span>
-              </div>
             </div>
           </div>
         </div>
@@ -67,16 +37,12 @@
         <div class="legend-grid">
           <div 
             *ngFor="let stat of statisticsData; trackBy: trackByScenario"
-            class="legend-item"
-            [class.highlighted]="hoveredData?.scenario === stat.scenario"
-            (mouseenter)="onLegendHover(stat)"
-            (mouseleave)="onLegendLeave()">
+            class="legend-item">
             <div class="legend-color" [style.background-color]="stat.color"></div>
             <div class="legend-info">
               <span class="legend-scenario">{{ stat.scenario }}</span>
               <div class="legend-stats">
                 <span class="legend-percentage">{{ stat.percentage }}%</span>
-                <span class="legend-count">({{ stat.sequenceCount }} sequences)</span>
               </div>
               <div class="legend-frames">
                 <span class="frames-label">Frame fraction:</span>
